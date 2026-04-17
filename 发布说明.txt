@@ -1,0 +1,14 @@
+Demo-show 发布约定（与 26XQ-list/showroom 平级需求无关）
+===============================================
+
+1. 本目录 26XQ-list/Demo-show/ 是独立 Git 仓库，只应包含对外演示用的 index 与静态资源。
+2. 不同步、不推送整个 26XQ-list 或其他需求目录；仅当你明确要上线的文件才加入本仓库并推送。
+3. 推荐流程：
+   a) 在 Demo-show 内执行同步（拉取 GitHub 最新）：
+      bash sync-publish.sh
+   b) 按大师兄指示更新 index.html 或复制子目录到本仓库后，仅添加相关路径并推送：
+      bash sync-publish.sh --push "说明文案" index.html
+      bash sync-publish.sh --push "说明文案" index.html 车务中心/xxx 智能识别系统/yyy
+4. GitHub Pages：仓库 Settings → Pages → Branch main / (root)；访问 https://<用户>.github.io/Demo-show/
+
+若 git fetch/pull 报 HTTP2 错误，脚本已尝试使用 HTTP/1.1；仍失败时请检查网络或稍后重试。
