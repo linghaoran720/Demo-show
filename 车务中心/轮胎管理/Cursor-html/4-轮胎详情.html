@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮胎详情 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    a{color:#165DFF;}
+    .layout-topnav{position:fixed;top:0;left:0;right:0;height:48px;background:#2B2B6E;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;}
+    .tn-left{display:flex;align-items:center;gap:8px;color:#fff;font-weight:600;}
+    .tn-g{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+    .tn-tabs{display:flex;margin-left:12px;}
+    .tn-tab{color:rgba(255,255,255,.72);padding:0 16px;height:48px;display:flex;align-items:center;border-bottom:2px solid transparent;font-size:14px;}
+    .tn-tab.on{color:#fff;background:rgba(255,255,255,.1);border-bottom-color:#fff;}
+    .tn-r{display:flex;align-items:center;gap:10px;}
+    .tn-s{width:200px;height:30px;border:none;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;padding:0 12px;font-size:13px;}
+    .tn-s::placeholder{color:rgba(255,255,255,.55);}
+    .av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#165DFF);}
+    .sider{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;z-index:90;overflow-y:auto;}
+    .su{padding:14px 12px;display:flex;gap:10px;border-bottom:1px solid #F2F3F5;}
+    .c36{width:36px;height:36px;border-radius:50%;background:#86909C;}
+    .sn{font-size:13px;font-weight:600;color:#1D2129;}
+    .so{font-size:12px;color:#86909C;}
+    .si{padding:8px 12px;}
+    .si input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+    .mi{padding:10px 16px;font-size:13px;}
+    .mi.s{padding-left:28px;font-size:12px;}
+    .mi.act{background:#F0F5FF;color:#165DFF;border-left:3px solid #165DFF;padding-left:13px;font-weight:500;}
+    .main{margin-left:200px;margin-top:48px;padding:16px 20px;max-width:1120px;}
+    .bc{font-size:13px;color:#86909C;margin-bottom:12px;}
+    .hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:16px;flex-wrap:wrap;}
+    .hd h1{font-size:18px;color:#1D2129;font-weight:600;}
+    .hd-sub{font-size:13px;color:#86909C;margin-top:4px;font-weight:400;}
+    .hd-actions{display:flex;gap:8px;flex-wrap:wrap;}
+    .card{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:18px 20px;margin-bottom:12px;}
+    .card-h{font-size:15px;font-weight:600;color:#1D2129;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #F2F3F5;}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 24px;}
+    .lab{font-size:12px;color:#86909C;margin-bottom:4px;}
+    .val{font-size:14px;color:#1D2129;font-weight:500;word-break:break-all;}
+    .mileage-stat{grid-column:1/-1;background:#F7F8FA;border:1px solid #E5E6EB;border-radius:4px;padding:12px 14px;}
+    .tag{display:inline-block;padding:2px 8px;border-radius:2px;font-size:12px;background:#E8FFEA;color:#00B42A;}
+    .fin{background:#F7F8FA;border:1px solid #E5E6EB;border-radius:4px;padding:14px;margin-top:16px;}
+    .fin-t{font-size:14px;font-weight:600;color:#1D2129;}
+    .fin-row{display:flex;gap:24px;flex-wrap:wrap;font-size:13px;margin-top:10px;}
+    .fin-row div span{color:#86909C;margin-right:6px;}
+    .btn{height:32px;padding:0 14px;border-radius:4px;border:1px solid #E5E6EB;background:#fff;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#4E5969;}
+    .btn-p{background:#165DFF;color:#fff;border-color:#165DFF;}
+    /* 生命周期：左轴 + 右卡片，避免重叠 */
+    .life-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+    .life-h strong{font-size:15px;color:#1D2129;font-weight:600;}
+    .life-h span{font-size:12px;color:#86909C;}
+    .timeline{list-style:none;}
+    .tl-item{display:grid;grid-template-columns:20px 1fr;gap:14px 16px;align-items:stretch;margin-bottom:20px;}
+    .tl-item:last-child{margin-bottom:0;}
+    .tl-rail{position:relative;display:flex;flex-direction:column;align-items:center;width:20px;}
+    .tl-dot{flex-shrink:0;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #165DFF;margin-top:6px;z-index:1;}
+    .tl-dot.ok{border-color:#00B42A;}
+    .tl-dot.warn{border-color:#FF7D00;}
+    .tl-dot.muted{border-color:#C9CDD4;}
+    .tl-rail::after{content:'';flex:1;width:2px;background:#E5E6EB;margin-top:4px;min-height:20px;}
+    .tl-item:last-child .tl-rail::after{display:none;}
+    .tl-card{background:#FAFBFC;border:1px solid #E5E6EB;border-radius:6px;padding:14px 16px;overflow:hidden;}
+    .tl-card.em{border-left:3px solid #165DFF;background:#fff;}
+    .tl-card.em.ok{border-left-color:#00B42A;}
+    .tl-card.em.warn{border-left-color:#FF7D00;}
+    .tl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;}
+    .tl-evt{font-size:14px;font-weight:600;color:#1D2129;line-height:1.4;}
+    .tl-time{font-size:12px;color:#86909C;white-space:nowrap;flex-shrink:0;}
+    /* 车辆司机快照 */
+    .snap{margin:0 0 12px 0;padding:10px 12px;background:#F2F3F5;border:1px solid #E5E6EB;border-radius:4px;}
+    .snap-t{font-size:12px;font-weight:600;color:#1D2129;margin-bottom:8px;}
+    .snap-t span{font-weight:400;color:#86909C;font-size:11px;margin-left:6px;}
+    .snap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 20px;font-size:13px;}
+    @media(min-width:900px){.snap-grid{grid-template-columns:repeat(4,1fr);}}
+    .snap-pair{display:flex;flex-direction:column;gap:2px;min-width:0;}
+    .snap-k{font-size:12px;color:#86909C;}
+    .snap-v{color:#1D2129;font-weight:500;}
+    .snap-v.na{color:#C9CDD4;font-weight:400;}
+    .tl-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 24px;font-size:13px;}
+    @media(min-width:800px){.tl-fields{grid-template-columns:repeat(3,1fr);}}
+    .tl-f{display:flex;flex-direction:column;gap:2px;min-width:0;}
+    .tl-fk{font-size:12px;color:#86909C;}
+    .tl-fv{color:#4E5969;}
+    .tl-note{margin-top:12px;padding-top:12px;border-top:1px solid #E5E6EB;font-size:13px;color:#4E5969;line-height:1.55;}
+    .foot-actions{text-align:right;margin-top:12px;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:13px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;border-radius:0 4px 4px 0;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+  </style>
+</head>
+<body>
+  <header class="layout-topnav">
+    <div class="tn-left"><span class="tn-g">G</span> 财运通
+      <nav class="tn-tabs"><span class="tn-tab">首页</span><span class="tn-tab on">轮胎管理</span></nav>
+    </div>
+    <div class="tn-r">
+      <input class="tn-s" placeholder="让查询更简单">
+      <button type="button" style="height:30px;padding:0 12px;border:none;border-radius:4px;background:#FF7D00;color:#fff;font-size:13px;">创建订单</button>
+      <span class="av"></span>
+    </div>
+  </header>
+  <aside class="sider">
+    <div class="su"><div class="c36"></div><div><div class="sn">超级管理员</div><div class="so">智能管车集团</div></div></div>
+    <a class="sd-back" href="1-轮胎卡片列表.html">← 返回轮胎卡片列表</a>
+    <div class="si"><input placeholder="搜索菜单"></div>
+    <nav class="sd-tire-tree">
+      <div class="sd-tree-h">轮胎管理</div>
+      <a class="sd-tree-item" href="1-轮胎卡片列表.html">轮胎卡片</a>
+      <a class="sd-tree-item" href="2-轮胎入库.html">轮胎入库</a>
+      <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+      <a class="sd-tree-item" href="5-轮胎回收.html">轮胎回收</a>
+      <a class="sd-tree-item" href="6-轮胎售卖.html">轮胎售卖</a>
+      <a class="sd-tree-item" href="7-创建报销单.html">创建报销单</a>
+      <a class="sd-tree-item active" href="4-轮胎详情.html">轮胎详情</a>
+      <a class="sd-tree-item" href="8-统计分析.html">数据分析</a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="bc"><a href="1-轮胎卡片列表.html">轮胎卡片</a> / 轮胎详情 · TL-2026-002</div>
+    <div class="hd">
+      <div>
+        <h1>轮胎详情</h1>
+        <p class="hd-sub">单一入口：上方为当前卡片与财务信息；下方为全量生命周期事件（演示时间正序），每条含「车辆/司机快照」以备审计与纠纷追溯。</p>
+      </div>
+      <div class="hd-actions">
+        <button type="button" class="btn btn-p" onclick="alert('演示：打开报销单抽屉（只读）')">报销单 BX20260331001</button>
+        <button type="button" class="btn" onclick="alert('演示：导出为 Excel / PDF')">导出履历</button>
+      </div>
+    </div>
+
+    <section class="card" aria-labelledby="sec-detail">
+      <h2 class="card-h" id="sec-detail">轮胎详情（主数据）</h2>
+      <div class="grid">
+        <div><div class="lab">轮胎编号</div><div class="val">TL-2026-002</div></div>
+        <div><div class="lab">入库单号</div><div class="val"><a href="#">总部仓库260330002</a></div></div>
+        <div><div class="lab">品牌 / 尺寸</div><div class="val">米其林 / 295/80R22.5</div></div>
+        <div><div class="lab">花纹规格</div><div class="val">深沟花纹</div></div>
+        <div><div class="lab">轮胎类型</div><div class="val">新胎</div></div>
+        <div><div class="lab">采购价</div><div class="val">¥1,280.00</div></div>
+        <div><div class="lab">采购日期</div><div class="val">2026-03-28</div></div>
+        <div><div class="lab">使用范围</div><div class="val">本级及下级</div></div>
+        <div><div class="lab">当前状态</div><div class="val"><span class="tag">已领用</span></div></div>
+        <div><div class="lab">当前车辆</div><div class="val">京A12345</div></div>
+        <div><div class="lab">安装位置</div><div class="val">前左</div></div>
+        <div><div class="lab">入库网点</div><div class="val">总部仓库</div></div>
+        <div class="mileage-stat">
+          <div class="lab">累计行驶里程</div>
+          <div class="val" style="margin-top:6px;font-weight:500;">GPS里程：23,466 km、码表里程：22,987 km</div>
+        </div>
+        <div><div class="lab">维修次数 / 累计成本</div><div class="val">1 次 / ¥250.00</div></div>
+      </div>
+      <div class="fin">
+        <div class="fin-t">财务关联（只读）</div>
+        <div class="fin-row">
+          <div><span>报销单</span><a href="#" onclick="alert('演示');return false;">BX20260331001</a></div>
+          <div><span>报销状态</span>已报销</div>
+          <div><span>已报销金额</span>¥1,280.00</div>
+          <div><span>收据</span>—</div>
+          <div><span>收据状态</span>—</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="lifecycle" aria-labelledby="sec-life">
+      <div class="life-h">
+        <div>
+          <strong id="sec-life">生命周期事件</strong>
+          <div><span>类型与方案一致：入库、领用、回收、作废、卖出；维修为 tire_repair_relation 单独留痕，非 tire_event。</span></div>
+        </div>
+        <button type="button" class="btn" onclick="alert('演示：导出')">导出</button>
+      </div>
+
+      <ul class="timeline" role="list">
+        <li class="tl-item">
+          <div class="tl-rail"><span class="tl-dot ok" aria-hidden="true"></span></div>
+          <div class="tl-card em ok">
+            <div class="tl-head">
+              <div class="tl-evt">入库</div>
+              <div class="tl-time">2026-03-28 10:30</div>
+            </div>
+            <div class="snap">
+              <div class="snap-t">车辆 / 司机快照 <span>事件发生时点固化，后续车辆过户不改动本条</span></div>
+              <div class="snap-grid">
+                <div class="snap-pair"><span class="snap-k">车牌号</span><span class="snap-v na">—</span></div>
+                <div class="snap-pair"><span class="snap-k">司机姓名</span><span class="snap-v na">—</span></div>
+                <div class="snap-pair"><span class="snap-k">司机手机</span><span class="snap-v na">—</span></div>
+                <div class="snap-pair"><span class="snap-k">说明</span><span class="snap-v">入库尚未装车，无车辆绑定</span></div>
+              </div>
+            </div>
+            <div class="tl-fields">
+              <div class="tl-f"><span class="tl-fk">网点</span><span class="tl-fv">总部仓库</span></div>
+              <div class="tl-f"><span class="tl-fk">入库单号</span><span class="tl-fv">总部仓库260330002</span></div>
+              <div class="tl-f"><span class="tl-fk">操作人</span><span class="tl-fv">张三</span></div>
+            </div>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-rail"><span class="tl-dot ok"></span></div>
+          <div class="tl-card em ok">
+            <div class="tl-head">
+              <div class="tl-evt">领用</div>
+              <div class="tl-time">2026-04-01 14:20</div>
+            </div>
+            <div class="snap">
+              <div class="snap-t">车辆 / 司机快照</div>
+              <div class="snap-grid">
+                <div class="snap-pair"><span class="snap-k">车牌号</span><span class="snap-v">京A12345</span></div>
+                <div class="snap-pair"><span class="snap-k">司机姓名</span><span class="snap-v">王强</span></div>
+                <div class="snap-pair"><span class="snap-k">司机手机</span><span class="snap-v">138****8000</span></div>
+                <div class="snap-pair"><span class="snap-k">领用人</span><span class="snap-v">李四（操作员）</span></div>
+              </div>
+            </div>
+            <div class="tl-fields">
+              <div class="tl-f"><span class="tl-fk">安装位置</span><span class="tl-fv">前左</span></div>
+              <div class="tl-f"><span class="tl-fk">码表里程</span><span class="tl-fv">125,800 km</span></div>
+              <div class="tl-f"><span class="tl-fk">操作人</span><span class="tl-fv">李四</span></div>
+            </div>
+            <div class="tl-note"><span class="tl-fk">领用原因：</span>新胎上路</div>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-rail"><span class="tl-dot warn"></span></div>
+          <div class="tl-card em warn">
+            <div class="tl-head">
+              <div class="tl-evt">维修关联（tire_repair_relation，非 tire_event）</div>
+              <div class="tl-time">2026-08-10 16:30</div>
+            </div>
+            <div class="snap">
+              <div class="snap-t">车辆 / 司机快照 <span>维修发生时的绑定关系</span></div>
+              <div class="snap-grid">
+                <div class="snap-pair"><span class="snap-k">车牌号</span><span class="snap-v">京A12345</span></div>
+                <div class="snap-pair"><span class="snap-k">司机姓名</span><span class="snap-v">王强</span></div>
+                <div class="snap-pair"><span class="snap-k">司机手机</span><span class="snap-v">138****8000</span></div>
+                <div class="snap-pair"><span class="snap-k">安装位置</span><span class="snap-v">前左</span></div>
+              </div>
+            </div>
+            <div class="tl-fields">
+              <div class="tl-f"><span class="tl-fk">维修单号</span><span class="tl-fv">WX20260810001</span></div>
+              <div class="tl-f"><span class="tl-fk">本次成本</span><span class="tl-fv">¥250.00</span></div>
+              <div class="tl-f"><span class="tl-fk">操作人</span><span class="tl-fv">王五</span></div>
+            </div>
+            <div class="tl-note">手动关联维修保养模块单据；同一轮胎 + 同一维修单不可重复关联。</div>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-rail"><span class="tl-dot muted"></span></div>
+          <div class="tl-card">
+            <div class="tl-head">
+              <div class="tl-evt">回收</div>
+              <div class="tl-time">（演示：尚未发生）</div>
+            </div>
+            <div class="snap">
+              <div class="snap-t">车辆 / 司机快照</div>
+              <div class="snap-grid">
+                <div class="snap-pair"><span class="snap-k">车牌号</span><span class="snap-v na">—</span></div>
+                <div class="snap-pair"><span class="snap-k">司机姓名</span><span class="snap-v na">—</span></div>
+                <div class="snap-pair"><span class="snap-k">司机手机</span><span class="snap-v na">—</span></div>
+                <div class="snap-pair"><span class="snap-k">说明</span><span class="snap-v na">无事件则无快照</span></div>
+              </div>
+            </div>
+            <div class="tl-note">正式回收后，状态变为「已回收」，快照应记录<strong>拆胎当时</strong>的车辆与司机。</div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <div class="foot-actions">
+      <a class="btn" href="1-轮胎卡片列表.html">返回列表</a>
+    </div>
+  </main>
+</body>
+</html>

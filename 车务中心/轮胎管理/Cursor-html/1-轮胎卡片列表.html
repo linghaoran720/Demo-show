@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮胎卡片管理 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    a{color:#165DFF;text-decoration:none;}
+    a:hover{color:#4080FF;}
+    .layout-topnav{position:fixed;top:0;left:0;right:0;height:48px;background:#2B2B6E;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 12px;z-index:100;}
+    .tn-left{display:flex;align-items:center;gap:8px;}
+    .tn-logo{color:#fff;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;}
+    .tn-logo-g{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+    .tn-tabs{display:flex;align-items:stretch;margin-left:12px;}
+    .tn-tab{color:rgba(255,255,255,.72);padding:0 16px;display:flex;align-items:center;border-bottom:2px solid transparent;cursor:default;font-size:14px;}
+    .tn-tab.active{color:#fff;background:rgba(255,255,255,.1);border-bottom-color:#fff;}
+    .tn-right{display:flex;align-items:center;gap:10px;}
+    .tn-search{width:200px;height:30px;border-radius:4px;border:none;background:rgba(255,255,255,.15);color:#fff;padding:0 12px;font-size:13px;}
+    .tn-search::placeholder{color:rgba(255,255,255,.55);}
+    .tn-btn{height:30px;padding:0 12px;border-radius:4px;border:none;font-size:13px;cursor:pointer;}
+    .tn-btn-orange{background:#FF7D00;color:#fff;}
+    .tn-btn-green{background:#00B42A;color:#fff;}
+    .tn-btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);}
+    .tn-ico{color:rgba(255,255,255,.85);font-size:16px;cursor:default;position:relative;padding:0 4px;}
+    .tn-badge{position:absolute;top:-6px;right:-4px;background:#F53F3F;color:#fff;font-size:10px;font-style:normal;min-width:18px;height:16px;line-height:16px;text-align:center;border-radius:8px;padding:0 4px;}
+    .tn-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#165DFF);border:2px solid rgba(255,255,255,.4);}
+    .layout-sider{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;z-index:90;overflow-y:auto;}
+    .sd-user{display:flex;align-items:center;gap:10px;padding:14px 12px;border-bottom:1px solid #F2F3F5;}
+    .sd-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#86909C,#4E5969);}
+    .sd-name{font-size:13px;color:#1D2129;font-weight:600;}
+    .sd-org{font-size:12px;color:#86909C;margin-top:2px;}
+    .sd-menu-search{padding:8px 12px;}
+    .sd-menu-search input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+    .sd-nav{padding:4px 0 16px;}
+    .sd-item{padding:10px 16px;font-size:13px;color:#4E5969;cursor:default;display:flex;align-items:center;gap:8px;}
+    .sd-item.sub{padding-left:28px;font-size:12px;}
+    .sd-item.active{background:#F0F5FF;color:#165DFF;font-weight:500;border-left:3px solid #165DFF;padding-left:13px;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:13px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;border-radius:0 4px 4px 0;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+    .layout-main{margin-left:200px;margin-top:48px;padding:16px 20px;min-height:calc(100vh - 48px);}
+    .panel{background:#fff;border-radius:4px;border:1px solid #E5E6EB;margin-bottom:8px;}
+    .page-inner-tabs{display:flex;border-bottom:1px solid #E5E6EB;padding:0 16px;background:#fff;border-radius:4px 4px 0 0;}
+    .pit-item{padding:12px 20px;font-size:14px;color:#4E5969;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+    .pit-item.active{color:#165DFF;font-weight:600;border-bottom-color:#165DFF;}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+    .stat-card{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:16px 18px;cursor:pointer;transition:box-shadow .15s;}
+    .stat-card:hover{box-shadow:0 2px 8px rgba(22,93,255,.12);}
+    .stat-label{font-size:13px;color:#86909C;}
+    .stat-val{font-size:22px;font-weight:600;color:#1D2129;margin-top:6px;}
+    .stat-val span{font-size:13px;font-weight:400;color:#86909C;margin-left:4px;}
+    .filter{padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:flex-end;}
+    .fi{display:flex;align-items:center;gap:8px;}
+    .fi label{font-size:13px;color:#4E5969;white-space:nowrap;}
+    .fi input,.fi select{height:32px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:13px;min-width:120px;}
+    .btn{height:32px;padding:0 14px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid transparent;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:#165DFF;color:#fff;}
+    .btn-primary:hover{background:#4080FF;}
+    .btn-default{background:#fff;color:#4E5969;border-color:#E5E6EB;}
+    .btn-default:hover{border-color:#165DFF;color:#165DFF;}
+    .toolbar{padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;border-top:1px solid #F2F3F5;}
+    .toolbar-left,.toolbar-right{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+    .table-wrap{overflow-x:auto;}
+    table.list{width:100%;border-collapse:collapse;font-size:13px;}
+    table.list thead th{background:#F7F8FA;color:#1D2129;font-weight:600;text-align:left;padding:10px 12px;border-bottom:1px solid #E5E6EB;white-space:nowrap;}
+    table.list tbody td{padding:10px 12px;border-bottom:1px solid #F2F3F5;color:#4E5969;}
+    table.list tbody tr:nth-child(even){background:#FAFBFC;}
+    table.list tbody tr:hover{background:#F0F5FF;}
+    .link{color:#165DFF;cursor:pointer;}
+    .link:hover{text-decoration:underline;}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+    .dot-b{background:#165DFF;}
+    .dot-g{background:#00B42A;}
+    .dot-o{background:#722ED1;}
+    .dot-gray{background:#C9CDD4;}
+    .dot-red{background:#F53F3F;}
+    .table-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #E5E6EB;background:#FAFBFC;font-size:13px;color:#4E5969;}
+    .pager{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .pager button,.pager select{height:28px;border:1px solid #E5E6EB;background:#fff;border-radius:4px;padding:0 8px;font-size:12px;cursor:pointer;}
+    .modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center;padding:24px;}
+    .modal-mask.show{display:flex;}
+    .modal{background:#fff;border-radius:8px;width:min(920px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.12);}
+    .modal-wide{width:min(1000px,98vw);}
+    .modal-hd{padding:14px 20px;border-bottom:1px solid #E5E6EB;display:flex;justify-content:space-between;align-items:center;}
+    .modal-hd h3{font-size:16px;color:#1D2129;font-weight:600;}
+    .modal-close{font-size:20px;color:#86909C;cursor:pointer;line-height:1;}
+    .modal-bd{padding:16px 20px;overflow-y:auto;flex:1;}
+    .modal-ft{padding:12px 20px;border-top:1px solid #E5E6EB;display:flex;justify-content:flex-end;gap:10px;}
+    .alert-red{background:#FFF1F0;border:1px solid #FFCCC7;color:#CF1322;font-size:12px;padding:8px 12px;border-radius:4px;margin-bottom:12px;}
+    .sec{margin-bottom:16px;}
+    .sec-t{font-size:14px;font-weight:600;color:#1D2129;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #F2F3F5;}
+    .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 20px;}
+    .fg-item label{display:block;font-size:13px;color:#4E5969;margin-bottom:6px;}
+    .fg-item label .req{color:#F53F3F;}
+    .fg-item input,.fg-item select{width:100%;height:32px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:13px;}
+    .fg-full{grid-column:1/-1;}
+    .mini-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .mini-table th,.mini-table td{border:1px solid #E5E6EB;padding:8px;text-align:left;}
+    .mini-table th{background:#F7F8FA;}
+    .upload-dashed{border:1px dashed #C9CDD4;border-radius:4px;padding:24px;text-align:center;color:#86909C;font-size:13px;}
+    .alert-info{background:#E8F3FF;border:1px solid #BEDAFF;color:#165DFF;font-size:12px;padding:8px 12px;border-radius:4px;margin-bottom:12px;line-height:1.5;}
+    .modal-sm{width:min(640px,96vw);}
+    .fg-item textarea{width:100%;min-height:88px;border:1px solid #E5E6EB;border-radius:4px;padding:8px 10px;font-size:13px;resize:vertical;font-family:inherit;}
+    .cancel-hint{font-size:12px;color:#86909C;line-height:1.5;margin-top:4px;}
+    .op-cell{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;max-width:320px;}
+    .op-link{background:none;border:none;padding:0;font-size:12px;color:#165DFF;cursor:pointer;text-decoration:underline;font-family:inherit;}
+    .op-link:hover{color:#4080FF;}
+    .op-tip{font-size:11px;color:#C9CDD4;}
+    .cell-disabled{background:#F2F3F5!important;color:#86909C!important;cursor:not-allowed!important;}
+    .ei-grid .fg-item textarea{min-height:64px;padding:8px 10px;}
+  </style>
+</head>
+<body>
+  <header class="layout-topnav">
+    <div class="tn-left">
+      <div class="tn-logo"><span class="tn-logo-g">G</span> 财运通</div>
+      <nav class="tn-tabs">
+        <span class="tn-tab">首页</span>
+        <span class="tn-tab">车务中心</span>
+        <span class="tn-tab active">轮胎管理</span>
+      </nav>
+    </div>
+    <div class="tn-right">
+      <input class="tn-search" type="search" placeholder="让查询更简单" aria-label="全局搜索">
+      <button type="button" class="tn-btn tn-btn-orange">创建订单</button>
+      <button type="button" class="tn-btn tn-btn-green">创建运单</button>
+      <button type="button" class="tn-btn tn-btn-ghost">平台跳转 ▾</button>
+      <span class="tn-ico" title="设置">⚙</span>
+      <span class="tn-ico tn-bell" title="消息">🔔<i class="tn-badge">120</i></span>
+      <span class="tn-avatar" title="账户"></span>
+    </div>
+  </header>
+  <aside class="layout-sider">
+    <div class="sd-user">
+      <div class="sd-avatar" aria-hidden="true"></div>
+      <div>
+        <div class="sd-name">超级管理员</div>
+        <div class="sd-org">智能管车集团</div>
+      </div>
+    </div>
+    <div class="sd-menu-search"><input placeholder="搜索菜单"></div>
+    <nav class="sd-nav">
+      <div class="sd-item">订单管理</div>
+      <div class="sd-item">运单管理</div>
+      <div class="sd-item">车务中心</div>
+      <div class="sd-tire-tree">
+        <div class="sd-tree-h">轮胎管理</div>
+        <a class="sd-tree-item active" href="1-轮胎卡片列表.html">轮胎卡片</a>
+        <a class="sd-tree-item" href="2-轮胎入库.html">轮胎入库</a>
+        <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+        <a class="sd-tree-item" href="5-轮胎回收.html">轮胎回收</a>
+        <a class="sd-tree-item" href="6-轮胎售卖.html">轮胎售卖</a>
+        <a class="sd-tree-item" href="7-创建报销单.html">创建报销单</a>
+        <a class="sd-tree-item" href="4-轮胎详情.html">轮胎详情</a>
+        <a class="sd-tree-item" href="8-统计分析.html">数据分析</a>
+      </div>
+      <div class="sd-item">报表中心</div>
+      <div class="sd-item">公司管理</div>
+    </nav>
+  </aside>
+  <main class="layout-main">
+    <div class="panel">
+      <div class="page-inner-tabs">
+        <div class="pit-item active" data-tab="cards">轮胎卡片</div>
+        <div class="pit-item" data-tab="analysis" id="pitAnalysis">数据分析</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-card" title="点击可筛选"><div class="stat-label">入库（在库新胎）</div><div class="stat-val">156<span>条</span></div></div>
+      <div class="stat-card"><div class="stat-label">已领用</div><div class="stat-val">324<span>条</span></div></div>
+      <div class="stat-card"><div class="stat-label">已回收 / 可流转</div><div class="stat-val">89<span>条</span></div></div>
+      <div class="stat-card"><div class="stat-label">已卖出</div><div class="stat-val">42<span>条</span></div></div>
+    </div>
+    <div class="panel">
+      <div class="filter">
+        <div class="fi"><label>所属组织</label><select><option>全部</option><option>总部仓库</option><option>北京分公司</option></select></div>
+        <div class="fi"><label>入库单号</label><input placeholder="总部仓库260330001"></div>
+        <div class="fi"><label>轮胎编号</label><input placeholder="TL-2026-001"></div>
+        <div class="fi"><label>当前车牌</label><input placeholder="京A12345"></div>
+        <div class="fi"><label>状态</label><select><option>全部</option><option>入库</option><option>已领用</option><option>已回收</option><option>已作废</option><option>售卖待确认</option><option>已卖出</option></select></div>
+        <div class="fi"><label>入库时间</label><input type="text" placeholder="开始" style="width:120px;"><span>~</span><input type="text" placeholder="结束" style="width:120px;"></div>
+        <button type="button" class="btn btn-primary">🔍 查询</button>
+        <button type="button" class="btn btn-default">重置</button>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <a class="btn btn-primary" href="2-轮胎入库.html">轮胎入库</a>
+          <button type="button" class="btn btn-default" id="btnEditInbound">修改入库单</button>
+          <a class="btn btn-default" href="3-轮胎领用.html">轮胎领用</a>
+          <a class="btn btn-default" href="5-轮胎回收.html">轮胎回收</a>
+          <button type="button" class="btn btn-default" title="PRD：仅已回收可报废" onclick="alert('演示：请先在列表勾选「已回收」状态的轮胎，再执行报废（后续可接独立页面）。')">轮胎报废</button>
+          <a class="btn btn-default" href="6-轮胎售卖.html">轮胎售卖</a>
+          <a class="btn btn-default" href="7-创建报销单.html">创建报销单</a>
+          <button type="button" class="btn btn-default" id="btnReceipt">创建收据</button>
+          <button type="button" class="btn btn-default" id="btnRepairLink">关联维修单</button>
+          <button type="button" class="btn btn-default" id="btnCancelOp">取消操作</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-default">导出</button>
+          <button type="button" class="btn btn-default">打印</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="list">
+          <thead>
+            <tr>
+              <th><input type="checkbox" aria-label="全选"></th>
+              <th>操作</th>
+              <th>入库单号</th>
+              <th>轮胎编号</th>
+              <th>品牌</th>
+              <th>尺寸</th>
+              <th>状态</th>
+              <th>采购价</th>
+              <th>报销状态</th>
+              <th>收据状态</th>
+              <th>领用人</th>
+              <th>当前车辆</th>
+              <th>安装位置</th>
+              <th>入库网点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-inbound="总部仓库260330001">
+              <td><input type="checkbox"></td>
+              <td class="op-cell">
+                <button type="button" class="op-link js-edit-inbound">修改</button>
+                <a class="op-link" href="3-轮胎领用.html">领用</a>
+                <a class="op-link" href="6-轮胎售卖.html">售卖</a>
+              </td>
+              <td><a href="#">总部仓库260330001</a></td>
+              <td><a class="link" href="4-轮胎详情.html">TL-2026-001</a></td>
+              <td>米其林</td>
+              <td>295/80R22.5</td>
+              <td><span class="dot dot-b"></span>入库</td>
+              <td>1,280.00</td>
+              <td><span class="dot dot-gray"></span>未报销</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>总部仓库</td>
+            </tr>
+            <tr data-inbound="总部仓库260330002">
+              <td><input type="checkbox"></td>
+              <td class="op-cell">
+                <button type="button" class="op-link js-edit-inbound">修改</button>
+                <a class="op-link" href="5-轮胎回收.html">回收</a>
+              </td>
+              <td><a href="#">总部仓库260330002</a></td>
+              <td><a class="link" href="4-轮胎详情.html">TL-2026-002</a></td>
+              <td>米其林</td>
+              <td>295/80R22.5</td>
+              <td><span class="dot dot-g"></span>已领用</td>
+              <td>1,280.00</td>
+              <td><span class="dot dot-g"></span>已报销</td>
+              <td>—</td>
+              <td>李四</td>
+              <td>京A12345</td>
+              <td>前左</td>
+              <td>总部仓库</td>
+            </tr>
+            <tr data-inbound="总部仓库260320099">
+              <td><input type="checkbox"></td>
+              <td class="op-cell">
+                <button type="button" class="op-link js-edit-inbound">修改</button>
+                <a class="op-link" href="3-轮胎领用.html">领用</a>
+                <button type="button" class="op-link" title="方案：已回收可报废" onclick="alert('演示：与工具栏「轮胎报废」相同，需勾选后批量作废（仅已回收/部分已作废场景）。')">报废</button>
+                <a class="op-link" href="6-轮胎售卖.html">售卖</a>
+              </td>
+              <td><a href="#">总部仓库260320099</a></td>
+              <td><a class="link" href="4-轮胎详情.html">TL-2026-020</a></td>
+              <td>邓禄普</td>
+              <td>315/80R22.5</td>
+              <td><span class="dot dot-g"></span>已回收</td>
+              <td>980.00</td>
+              <td><span class="dot dot-gray"></span>未报销</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>总部仓库</td>
+            </tr>
+            <tr data-inbound="总部仓库260315088">
+              <td><input type="checkbox"></td>
+              <td class="op-cell">
+                <button type="button" class="op-link js-edit-inbound">修改</button>
+                <a class="op-link" href="6-轮胎售卖.html">售卖</a>
+              </td>
+              <td><a href="#">总部仓库260315088</a></td>
+              <td><a class="link" href="4-轮胎详情.html">TL-2026-088</a></td>
+              <td>朝阳</td>
+              <td>12R22.5</td>
+              <td><span class="dot dot-red"></span>已作废</td>
+              <td>—</td>
+              <td><span class="dot dot-gray"></span>未报销</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>总部仓库</td>
+            </tr>
+            <tr data-inbound="总部仓库260325008">
+              <td><input type="checkbox"></td>
+              <td class="op-cell">
+                <button type="button" class="op-link js-edit-inbound">修改</button>
+                <span class="op-tip" title="方案 §4.10.3.1：售卖待确认且已建收据流程中，无领用/回收/报废/售卖">收据流程</span>
+              </td>
+              <td><a href="#">总部仓库260325008</a></td>
+              <td><a class="link" href="4-轮胎详情.html">TL-2026-015</a></td>
+              <td>固特异</td>
+              <td>295/80R22.5</td>
+              <td><span class="dot dot-o"></span>售卖待确认</td>
+              <td>1,100.00</td>
+              <td><span class="dot dot-g"></span>已报销</td>
+              <td><span class="dot dot-o"></span>待审批</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>总部仓库</td>
+            </tr>
+            <tr data-inbound="总部仓库260311200">
+              <td><input type="checkbox"></td>
+              <td class="op-cell">
+                <button type="button" class="op-link js-edit-inbound">修改</button>
+                <span class="op-tip" title="已卖出，仅可查">已卖出</span>
+              </td>
+              <td><a href="#">总部仓库260311200</a></td>
+              <td><a class="link" href="4-轮胎详情.html">TL-2026-099</a></td>
+              <td>米其林</td>
+              <td>295/80R22.5</td>
+              <td><span class="dot dot-gray"></span>已卖出</td>
+              <td>1,050.00</td>
+              <td><span class="dot dot-g"></span>已报销</td>
+              <td><span class="dot dot-g"></span>已通过</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+              <td>总部仓库</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-foot">
+        <span>已选 <strong>0</strong> 条　合计 <strong>6</strong> 条轮胎（演示）</span>
+        <div class="pager">
+          <span style="color:#86909C;font-size:12px;">1 / 共1页</span>
+          <button type="button">«</button><button type="button">‹</button>
+          <button type="button" class="btn-primary" style="min-width:28px;">1</button>
+          <button type="button">›</button><button type="button">»</button>
+          <select><option>20 条/页</option><option>50 条/页</option></select>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-mask" id="modalEditInbound" role="dialog" aria-modal="true" aria-labelledby="eiTitle">
+    <div class="modal modal-wide">
+      <div class="modal-hd">
+        <h3 id="eiTitle">修改入库单</h3>
+        <span class="modal-close" id="closeEditInbound" role="button">&times;</span>
+      </div>
+      <div class="modal-bd ei-grid">
+        <div class="alert-info">
+          <strong>方案 §4.1.5–§4.1.7：</strong>以<strong>入库单号</strong>为维度展示本单下全部轮胎；可同时改基本信息与明细。明细中<strong>序号、轮胎编号、当前状态</strong>只读；<strong>品牌/尺寸/规格/型号/单价/类型</strong>是否可编 depend on 轮胎状态与报销状态（入库可全改；已创建<strong>收据/售卖待确认</strong>或<strong>已报销</strong>则明细全置灰；未报销且单价为空仅允许回填单价等，见 §4.1.6）。<strong>入库单号</strong>不可改、不可跨单修改。
+        </div>
+        <div class="sec">
+          <div class="sec-t">基本信息</div>
+          <div class="form-grid">
+            <div class="fg-item">
+              <label><span class="req">*</span> 入库来源</label>
+              <input type="text" id="eiSource" placeholder="如 采购、回收">
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 联系人</label>
+              <input type="text" id="eiContact" placeholder="经办人">
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 入库时间</label>
+              <input type="datetime-local" id="eiTime">
+            </div>
+            <div class="fg-item">
+              <label>采购方</label>
+              <select id="eiBuyer"><option value="">—</option><option>本级抬头 A</option><option>集团采购中心</option></select>
+            </div>
+            <div class="fg-item">
+              <label>供应商</label>
+              <input type="text" id="eiSupplier" placeholder="供应商名称">
+            </div>
+            <div class="fg-item">
+              <label>供应商电话</label>
+              <input type="text" id="eiPhone" placeholder="手机 / 固话">
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 使用范围</label>
+              <select id="eiScope"><option>本级及下级</option><option>本级</option><option>全集团</option></select>
+            </div>
+            <div class="fg-item fg-full">
+              <label>备注</label>
+              <textarea id="eiRemark" placeholder="入库备注"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-t">轮胎明细（本入库单下全部轮胎）</div>
+          <div class="table-wrap">
+            <table class="mini-table" id="eiTable">
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>轮胎编号</th>
+                  <th>品牌</th>
+                  <th>尺寸</th>
+                  <th>规格</th>
+                  <th>型号</th>
+                  <th>单价(元)</th>
+                  <th>轮胎类型</th>
+                  <th>当前状态</th>
+                </tr>
+              </thead>
+              <tbody id="eiTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button type="button" class="btn btn-default" id="cancelEditInbound">取消</button>
+        <button type="button" class="btn btn-primary" id="okEditInbound">确认修改</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modalRepairLink" role="dialog" aria-modal="true" aria-labelledby="rpLinkTitle">
+    <div class="modal modal-sm">
+      <div class="modal-hd">
+        <h3 id="rpLinkTitle">关联维修单</h3>
+        <span class="modal-close" id="closeRepairLink" role="button">&times;</span>
+      </div>
+      <div class="modal-bd">
+        <div class="alert-info">
+          <strong>方案 §3.8 / §5.2（手动关联）：</strong>与维修保养模块<strong>不做自动对接</strong>——不监听维保事件、不调用维保 API；维修单据编号仅作<strong>记录与追溯</strong>（MVP 对单据真伪不做强制校验）。轮胎在<strong>任意状态</strong>均可登记；单据编号<strong>选填</strong>（可不关联单据、仅记金额）；<strong>本次维修成本必填</strong>。若填写单据编号，后端需校验<strong>同一轮胎不得重复关联同一维修单据</strong>（<code>tire_repair_relation</code> 唯一约束）；冲突时提示「该维修单据已关联过此轮胎」。提交后<strong>仅更新</strong>轮胎卡片上的维修次数与累计成本，<strong>不产生单独的「维修」生命周期事件</strong>（与方案数据说明一致）。
+        </div>
+        <div class="alert-red" style="margin-bottom:12px;">列表需<strong>勾选且仅勾选 1 条</strong>轮胎后再确认（方案 §4.10.5：维修记录入口）。</div>
+        <div class="sec">
+          <div class="sec-t">待关联轮胎</div>
+          <table class="mini-table">
+            <thead>
+              <tr><th>轮胎编号</th><th>当前状态</th></tr>
+            </thead>
+            <tbody id="rpTbody"></tbody>
+          </table>
+        </div>
+        <div class="sec">
+          <div class="sec-t">维修单据与成本</div>
+          <div class="form-grid">
+            <div class="fg-item fg-full">
+              <label>维修单据编号（选填）</label>
+              <input id="rpOrderId" placeholder="如 WX202603280001，与维修保养模块单据号一致">
+            </div>
+            <div class="fg-item">
+              <label>维修单据含税总额（选填）</label>
+              <input type="number" id="rpDocTotal" placeholder="用于核对" step="0.01">
+              <p class="cancel-hint">业务规则建议：本次维修成本 ≤ 维修单据成本（见 §5.2）；填总额后若超出将二次确认。</p>
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 本次维修成本（元）</label>
+              <input type="number" id="rpCost" placeholder="必填，累加至累计维修成本" step="0.01">
+            </div>
+            <div class="fg-item fg-full">
+              <label>备注</label>
+              <input id="rpRemark" placeholder="选填，写入关联记录">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button type="button" class="btn btn-default" id="cancelRepairLink">取消</button>
+        <button type="button" class="btn btn-primary" id="okRepairLink">确认关联</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modalCancelOp" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+    <div class="modal modal-sm">
+      <div class="modal-hd">
+        <h3 id="coTitle">取消操作</h3>
+        <span class="modal-close" id="closeCancelOp" role="button">&times;</span>
+      </div>
+      <div class="modal-bd">
+        <div class="alert-info">
+          <strong>方案 §4.8：</strong>撤销已执行操作并将轮胎状态恢复至操作前；支持批量；须填写<strong>取消原因</strong>；系统记录取消事件与操作日志；实际环境需权限校验（入库管理/领用/回收/报废/售卖等撤销权限）。
+        </div>
+        <div class="alert-red" style="margin-bottom:12px;">请先勾选列表中的轮胎，再选择要撤销的操作类型。状态需与所选类型匹配（如「取消领用」仅适用于当前为「已领用」的轮胎）。</div>
+        <div class="sec">
+          <div class="sec-t">操作类型</div>
+          <div class="form-grid">
+            <div class="fg-item fg-full">
+              <label><span class="req">*</span> 撤销类型</label>
+              <select id="coType">
+                <option value="">请选择</option>
+                <option value="del_in">删除入库（原状态：入库 → 已删除）</option>
+                <option value="cancel_use">取消领用</option>
+                <option value="cancel_recv">取消回收</option>
+                <option value="cancel_scrap">取消报废</option>
+                <option value="cancel_sell">取消售卖</option>
+              </select>
+              <p class="cancel-hint">入口与方案一致：列表勾选 → 「取消操作」→ 下拉选择类型 → 提交。</p>
+            </div>
+            <div class="fg-item fg-full">
+              <label><span class="req">*</span> 取消原因</label>
+              <textarea id="coReason" placeholder="必填，将写入操作日志"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button type="button" class="btn btn-default" id="cancelCancelOp">关闭</button>
+        <button type="button" class="btn btn-primary" id="okCancelOp">提交撤销</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modalReceipt" role="dialog" aria-modal="true" aria-labelledby="rcTitle">
+    <div class="modal modal-sm">
+      <div class="modal-hd">
+        <h3 id="rcTitle">创建财务收据</h3>
+        <span class="modal-close" id="closeReceipt" role="button">&times;</span>
+      </div>
+      <div class="modal-bd">
+        <div class="alert-info">
+          <strong>与 PRD §5.5 / §5.8 的关系：</strong>正常路径下，用户在「轮胎售卖」确认后由<strong>系统自动创建收据</strong>并置为待审批。本按钮用于「创建收据」入口的补充场景：<strong>补开/手工开立</strong>、或与列表勾选联动，对已达成售卖意向但需补录收据信息的轮胎发起财务收据（演示）。
+        </div>
+        <div class="alert-red" style="margin-bottom:12px;">请勾选需关联收据的轮胎（建议：状态为「售卖待确认」或即将售卖的「已回收/已作废」）。未选时仍可填写下方表单做流程演示。</div>
+        <div class="sec">
+          <div class="sec-t">关联轮胎（演示：来自当前列表勾选）</div>
+          <table class="mini-table">
+            <thead>
+              <tr><th>轮胎编号</th><th>状态</th><th>采购价</th><th>拟售总价</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>TL-2026-015</td><td>售卖待确认</td><td>1,100.00</td><td><input type="number" id="rcSellAmt" value="950" style="width:100px;height:28px;border:1px solid #E5E6EB;border-radius:4px;padding:0 8px;"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sec">
+          <div class="sec-t">收据抬头（财务收入类单据）</div>
+          <div class="form-grid">
+            <div class="fg-item fg-full">
+              <label><span class="req">*</span> 购买方 / 客户名称</label>
+              <input id="rcBuyer" placeholder="与售卖对象一致">
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 联系人</label>
+              <input id="rcCt" placeholder="姓名">
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 联系电话</label>
+              <input id="rcTel" placeholder="手机号">
+            </div>
+            <div class="fg-item">
+              <label><span class="req">*</span> 收据含税金额(元)</label>
+              <input type="number" id="rcMoney" value="950" step="0.01">
+            </div>
+            <div class="fg-item fg-full" id="rcDiffWrap" style="display:none;">
+              <label><span class="req">*</span> 价格差异原因（收据金额低于采购价时必填）</label>
+              <input id="rcDiff" placeholder="PRD 与售卖一致">
+            </div>
+            <div class="fg-item fg-full">
+              <label>备注</label>
+              <input id="rcRm" placeholder="选填">
+            </div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-t">附件（选填）</div>
+          <div class="upload-dashed" style="padding:16px;">点击或拖拽上传合同/过磅单等（演示）</div>
+        </div>
+      </div>
+      <div class="modal-ft">
+        <button type="button" class="btn btn-default" id="cancelReceipt">取消</button>
+        <button type="button" class="btn btn-primary" id="okReceipt">提交财务（待审批）</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    document.querySelectorAll('.pit-item').forEach(function(t,_,arr){
+      t.onclick=function(){
+        if(t.getAttribute('data-tab')==='analysis'){location.href='8-统计分析.html';return;}
+        arr.forEach(function(x){x.classList.remove('active');});
+        t.classList.add('active');
+      };
+    });
+
+    var EI_DATA={
+      '总部仓库260330001':{
+        header:{source:'采购',contact:'张三',time:'2026-03-28T10:30',buyer:'',supplier:'××胎业',phone:'13800001111',scope:'本级及下级',remark:''},
+        tires:[
+          {no:'TL-2026-001',brand:'米其林',size:'295/80R22.5',spec:'深沟花纹',model:'XZE2+',price:'1280',ttype:'新胎',status:'入库',mode:'full'},
+          {no:'TL-2026-001B',brand:'米其林',size:'295/80R22.5',spec:'深沟花纹',model:'XZE2+',price:'1280',ttype:'新胎',status:'入库',mode:'full'}
+        ]
+      },
+      '总部仓库260330002':{
+        header:{source:'采购',contact:'李四',time:'2026-03-29T09:00',buyer:'',supplier:'××胎业',phone:'13800002222',scope:'本级及下级',remark:''},
+        tires:[{no:'TL-2026-002',brand:'米其林',size:'295/80R22.5',spec:'深沟花纹',model:'XZE2+',price:'1280',ttype:'新胎',status:'已领用',mode:'none'}]
+      },
+      '总部仓库260320099':{
+        header:{source:'回收',contact:'王五',time:'2026-03-20T14:00',buyer:'',supplier:'',phone:'',scope:'本级及下级',remark:'旧胎回库'},
+        tires:[{no:'TL-2026-020',brand:'邓禄普',size:'315/80R22.5',spec:'标准花',model:'SP831',price:'980',ttype:'旧胎',status:'已回收',mode:'none'}]
+      },
+      '总部仓库260315088':{
+        header:{source:'采购',contact:'赵六',time:'2026-03-15T11:00',buyer:'',supplier:'区域供应商',phone:'010-12345678',scope:'本级',remark:''},
+        tires:[{no:'TL-2026-088',brand:'朝阳',size:'12R22.5',spec:'—',model:'—',price:'',ttype:'旧胎',status:'已作废',mode:'price_only'}]
+      },
+      '总部仓库260325008':{
+        header:{source:'采购',contact:'钱七',time:'2026-03-25T16:00',buyer:'',supplier:'固特异渠道',phone:'',scope:'本级及下级',remark:''},
+        tires:[{no:'TL-2026-015',brand:'固特异',size:'295/80R22.5',spec:'城市公路',model:'G159',price:'1100',ttype:'新胎',status:'售卖待确认',mode:'none'}]
+      },
+      '总部仓库260311200':{
+        header:{source:'采购',contact:'孙八',time:'2026-03-11T08:00',buyer:'',supplier:'',phone:'',scope:'本级及下级',remark:''},
+        tires:[{no:'TL-2026-099',brand:'米其林',size:'295/80R22.5',spec:'深沟',model:'X Line Energy',price:'1050',ttype:'新胎',status:'已卖出',mode:'none'}]
+      }
+    };
+
+    function eiFieldFlags(mode){
+      if(mode==='full') return {brand:1,size:1,spec:1,model:1,price:1,type:1};
+      if(mode==='price_only') return {price:1};
+      return {};
+    }
+    function eiFillHeader(h){
+      document.getElementById('eiSource').value=h.source;
+      document.getElementById('eiContact').value=h.contact;
+      document.getElementById('eiTime').value=h.time;
+      document.getElementById('eiBuyer').selectedIndex=0;
+      document.getElementById('eiSupplier').value=h.supplier||'';
+      document.getElementById('eiPhone').value=h.phone||'';
+      var sc=document.getElementById('eiScope');
+      for(var i=0;i<sc.options.length;i++){if(sc.options[i].text===h.scope){sc.selectedIndex=i;break;}}
+      document.getElementById('eiRemark').value=h.remark||'';
+    }
+    function eiBuildTbody(inboundNo){
+      var tb=document.getElementById('eiTbody');
+      tb.innerHTML='';
+      var pack=EI_DATA[inboundNo];
+      if(!pack){
+        tb.innerHTML='<tr><td colspan="9" style="color:#86909C;padding:14px;">（演示）未配置该入库单的预制明细，提交仅走界面校验。</td></tr>';
+        return;
+      }
+      function mkInput(val,en){
+        var inp=document.createElement('input');
+        inp.type='text';
+        inp.value=val;
+        inp.style.cssText='width:100%;min-width:72px;height:28px;border:1px solid #E5E6EB;border-radius:4px;padding:0 6px;font-size:12px;box-sizing:border-box;';
+        if(!en){inp.disabled=true;inp.className='cell-disabled';}
+        return inp;
+      }
+      function mkType(val,en){
+        if(en){
+          var sel=document.createElement('select');
+          sel.style.cssText='width:100%;height:28px;font-size:12px;';
+          ['新胎','旧胎'].forEach(function(x){var o=document.createElement('option');o.textContent=x;sel.appendChild(o);});
+          sel.value=val;
+          return sel;
+        }
+        return mkInput(val,false);
+      }
+      pack.tires.forEach(function(t,idx){
+        var tr=document.createElement('tr');
+        var f=eiFieldFlags(t.mode);
+        function td(el){var d=document.createElement('td');d.appendChild(el);tr.appendChild(d);}
+        function tdTxt(x){var d=document.createElement('td');d.textContent=x;tr.appendChild(d);}
+        tdTxt(String(idx+1));
+        tdTxt(t.no);
+        td(mkInput(t.brand,!!f.brand));
+        td(mkInput(t.size,!!f.size));
+        td(mkInput(t.spec,!!f.spec));
+        td(mkInput(t.model,!!f.model));
+        td(mkInput(t.price,!!f.price));
+        td(mkType(t.ttype,!!f.type));
+        var st=document.createElement('td');st.textContent=t.status;st.style.background='#F7F8FA';st.style.color='#86909C';tr.appendChild(st);
+        tb.appendChild(tr);
+      });
+    }
+    var mEi=document.getElementById('modalEditInbound');
+    function hEi(){mEi.classList.remove('show');}
+    function openEditInbound(inboundNo){
+      document.getElementById('eiTitle').textContent='修改入库单 - '+inboundNo;
+      var pack=EI_DATA[inboundNo];
+      if(pack) eiFillHeader(pack.header);
+      eiBuildTbody(inboundNo);
+      mEi.classList.add('show');
+    }
+    document.getElementById('closeEditInbound').onclick=hEi;
+    document.getElementById('cancelEditInbound').onclick=hEi;
+    mEi.addEventListener('click',function(e){if(e.target===mEi)hEi();});
+    document.getElementById('btnEditInbound').onclick=function(){
+      var sel=null;
+      document.querySelectorAll('table.list tbody tr').forEach(function(tr){
+        var cb=tr.querySelector('input[type=checkbox]');
+        if(cb&&cb.checked) sel=tr;
+      });
+      if(!sel){alert('请先在列表中勾选至少一条轮胎，再点「修改入库单」（方案 §4.1.7 步骤1）。');return;}
+      openEditInbound(sel.getAttribute('data-inbound'));
+    };
+    document.querySelector('table.list tbody').addEventListener('click',function(e){
+      var t=e.target;
+      if(t&&t.classList&&t.classList.contains('js-edit-inbound')){
+        var tr=t.closest('tr');
+        if(tr) openEditInbound(tr.getAttribute('data-inbound'));
+      }
+    });
+    document.getElementById('okEditInbound').onclick=function(){
+      if(!document.getElementById('eiSource').value.trim()||!document.getElementById('eiContact').value.trim()||!document.getElementById('eiTime').value){
+        alert('请填写入库来源、联系人、入库时间（§4.1.6 必填）。');return;
+      }
+      alert('演示：校验通过后已更新入库单基本信息与可编辑的轮胎明细；置灰字段未提交（§4.1.6 权限与 §4.1.5 售卖待确认/已报销规则）。');
+      hEi();
+    };
+
+    var mRepair=document.getElementById('modalRepairLink');
+    function hRepair(){mRepair.classList.remove('show');}
+    function syncRepairTbody(){
+      var tb=document.getElementById('rpTbody');
+      tb.innerHTML='';
+      var rows=[];
+      document.querySelectorAll('table.list tbody tr').forEach(function(tr){
+        var cb=tr.querySelector('input[type=checkbox]');
+        if(cb&&cb.checked) rows.push(tr);
+      });
+      if(rows.length===0){
+        tb.innerHTML='<tr><td colspan="2" style="color:#86909C;">（未勾选）请在列表中勾选 <strong>1</strong> 条轮胎。</td></tr>';
+        return rows.length;
+      }
+      rows.forEach(function(tr){
+        var tds=tr.querySelectorAll('td');
+        var no=tds[3].textContent.trim();
+        var st=tds[6].textContent.replace(/\s+/g,' ').trim();
+        var r=document.createElement('tr');
+        var c0=document.createElement('td');c0.textContent=no;
+        var c1=document.createElement('td');c1.textContent=st;
+        r.appendChild(c0);r.appendChild(c1);tb.appendChild(r);
+      });
+      return rows.length;
+    }
+    document.getElementById('btnRepairLink').onclick=function(){syncRepairTbody();mRepair.classList.add('show');};
+    document.getElementById('closeRepairLink').onclick=hRepair;
+    document.getElementById('cancelRepairLink').onclick=hRepair;
+    mRepair.addEventListener('click',function(e){if(e.target===mRepair)hRepair();});
+    document.getElementById('okRepairLink').onclick=function(){
+      var n=0;
+      document.querySelectorAll('table.list tbody tr').forEach(function(tr){
+        var cb=tr.querySelector('input[type=checkbox]');
+        if(cb&&cb.checked) n++;
+      });
+      if(n!==1){alert('请勾选且仅勾选 1 条轮胎（方案 §4.10.5）。');return;}
+      var cost=parseFloat(document.getElementById('rpCost').value);
+      if(isNaN(cost)||cost<=0){alert('请填写有效的本次维修成本（§3.8 必填）。');return;}
+      var docTotal=parseFloat(document.getElementById('rpDocTotal').value);
+      if(!isNaN(docTotal)&&docTotal>0&&cost>docTotal){
+        if(!window.confirm('本次维修成本大于所填「维修单据含税总额」，方案 §5.2 建议本次成本≤单据成本。是否仍要提交？'))return;
+      }
+      var oid=document.getElementById('rpOrderId').value.trim();
+      alert('演示：已写入 tire_repair_relation'+(oid?'（单据 '+oid+'）':'（未填单据号，仅记金额）')+'；轮胎维修次数 +1，累计维修成本 +'+'¥'+cost.toFixed(2)+'。§3.8：不产生单独维修类生命周期事件。');
+      hRepair();
+    };
+
+    var mc=document.getElementById('modalCancelOp');
+    function hc(){mc.classList.remove('show');}
+    document.getElementById('btnCancelOp').onclick=function(){mc.classList.add('show');};
+    document.getElementById('closeCancelOp').onclick=hc;
+    document.getElementById('cancelCancelOp').onclick=hc;
+    mc.addEventListener('click',function(e){if(e.target===mc)hc();});
+    document.getElementById('okCancelOp').onclick=function(){
+      var n=document.querySelectorAll('table.list tbody input[type=checkbox]:checked').length;
+      if(n<1){alert('请先勾选至少一条轮胎（方案 §4.8 / 列表批量）。');return;}
+      if(!document.getElementById('coType').value){alert('请选择撤销类型。');return;}
+      if(!document.getElementById('coReason').value.trim()){alert('请填写取消原因。');return;}
+      alert('演示：已提交批量撤销 '+n+' 条，状态回退并写入取消事件与日志（方案 §4.8 状态转换表）。');
+      hc();
+    };
+
+    var mr=document.getElementById('modalReceipt');
+    function hr(){mr.classList.remove('show');}
+    document.getElementById('btnReceipt').onclick=function(){mr.classList.add('show');syncRcDiff();};
+    document.getElementById('closeReceipt').onclick=hr;
+    document.getElementById('cancelReceipt').onclick=hr;
+    mr.addEventListener('click',function(e){if(e.target===mr)hr();});
+    function syncRcDiff(){
+      var buy=1100, sell=parseFloat(document.getElementById('rcSellAmt').value)||0;
+      document.getElementById('rcDiffWrap').style.display= sell < buy ? 'block':'none';
+    }
+    document.getElementById('rcSellAmt').addEventListener('input',function(){document.getElementById('rcMoney').value=this.value;syncRcDiff();});
+    document.getElementById('rcMoney').addEventListener('input',function(){
+      var buy=1100,v=parseFloat(this.value)||0;
+      document.getElementById('rcDiffWrap').style.display= v<buy?'block':'none';
+    });
+    document.getElementById('okReceipt').onclick=function(){
+      if(!document.getElementById('rcBuyer').value.trim()||!document.getElementById('rcCt').value.trim()||!document.getElementById('rcTel').value.trim()){alert('请填写购买方与联系人信息');return;}
+      var money=parseFloat(document.getElementById('rcMoney').value);
+      if(isNaN(money)||money<=0){alert('请填写有效金额');return;}
+      if(money<1100&&!document.getElementById('rcDiff').value.trim()){alert('金额低于采购价时须填写价格差异原因');return;}
+      alert('演示：已生成收据 SJ202603310099，receipt_status=待审批。\n财务人员可在财务中心审批；通过后轮胎状态→已卖出（PRD §5.8）。');
+      hr();
+    };
+  })();
+  </script>
+</body>
+</html>

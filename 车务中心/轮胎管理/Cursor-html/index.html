@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>轮胎管理 - 原型导航</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;background:#F2F3F5;color:#4E5969;min-height:100vh;}
+    .top{height:48px;background:#2B2B6E;display:flex;align-items:center;padding:0 20px;color:#fff;font-weight:600;gap:10px;}
+    .top span.g{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;}
+    .wrap{max-width:1040px;margin:32px auto;padding:0 24px;}
+    h1{font-size:20px;color:#1D2129;font-weight:600;margin-bottom:6px;}
+    .sub{color:#86909C;font-size:13px;margin-bottom:24px;line-height:1.6;}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+    @media(min-width:920px){.grid{grid-template-columns:repeat(4,1fr);}}
+    .card{background:#fff;border:1px solid #E5E6EB;border-radius:8px;padding:16px 14px;text-decoration:none;display:block;color:inherit;transition:box-shadow .15s;}
+    .card:hover{box-shadow:0 4px 14px rgba(22,93,255,.12);border-color:#C3D4FF;}
+    .num{width:28px;height:28px;border-radius:50%;background:#165DFF;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;margin-bottom:8px;}
+    .title{font-size:14px;font-weight:600;color:#1D2129;margin-bottom:4px;}
+    .desc{font-size:11px;color:#86909C;line-height:1.5;}
+    .tag{display:inline-block;margin-top:8px;padding:2px 6px;border-radius:2px;font-size:10px;}
+    .p0{background:#FFECE8;color:#CB272D;}
+    .p1{background:#E8F3FF;color:#165DFF;}
+    .note{margin-top:24px;padding:14px;background:#fff;border:1px solid #E5E6EB;border-radius:8px;font-size:13px;color:#4E5969;line-height:1.65;}
+    .note strong{color:#1D2129;}
+  </style>
+</head>
+<body>
+  <div class="top"><span class="g">G</span> 财运通 · 轮胎管理原型</div>
+  <div class="wrap">
+    <h1>轮胎管理模块 · 交互原型</h1>
+    <p class="sub">依据《轮胎管理-PRD-v1.0》《轮胎管理-方案设计》；内联 CSS/JS，无外部依赖。列表页含<strong>创建收据</strong>弹窗（与自动开单路径并列说明）。</p>
+    <div class="grid">
+      <a class="card" href="1-轮胎卡片列表.html">
+        <div class="num">1</div>
+        <div class="title">轮胎卡片列表</div>
+        <div class="desc">筛选、工具栏；入库弹窗；回收/售卖/报销入口；创建收据弹窗。</div>
+        <span class="tag p0">P0</span>
+      </a>
+      <a class="card" href="2-轮胎入库.html">
+        <div class="num">2</div>
+        <div class="title">轮胎入库</div>
+        <div class="desc">基本信息、明细、批量编号。</div>
+        <span class="tag p0">P0</span>
+      </a>
+      <a class="card" href="3-轮胎领用.html">
+        <div class="num">3</div>
+        <div class="title">轮胎领用</div>
+        <div class="desc">车辆/司机、选胎、批量进度。</div>
+        <span class="tag p0">P0</span>
+      </a>
+      <a class="card" href="4-轮胎详情.html">
+        <div class="num">4</div>
+        <div class="title">轮胎详情</div>
+        <div class="desc">主数据+财务；生命周期与事件快照。</div>
+        <span class="tag p1">P1</span>
+      </a>
+      <a class="card" href="5-轮胎回收.html">
+        <div class="num">5</div>
+        <div class="title">轮胎回收</div>
+        <div class="desc">PRD §5.3：已领用可回收、原因、快照说明、批量演示。</div>
+        <span class="tag p0">P0</span>
+      </a>
+      <a class="card" href="6-轮胎售卖.html">
+        <div class="num">6</div>
+        <div class="title">轮胎售卖</div>
+        <div class="desc">PRD §5.5：收方信息、差价原因、自动收据。</div>
+        <span class="tag p0">P0</span>
+      </a>
+      <a class="card" href="7-创建报销单.html">
+        <div class="num">7</div>
+        <div class="title">创建报销单</div>
+        <div class="desc">PRD §5.7：总额、说明、比例分摊预览与校验。</div>
+        <span class="tag p1">P1</span>
+      </a>
+      <a class="card" href="8-统计分析.html">
+        <div class="num">8</div>
+        <div class="title">统计分析</div>
+        <div class="desc">KPI、示意柱图、排行。</div>
+        <span class="tag p1">P1</span>
+      </a>
+    </div>
+    <div class="note">
+      <strong>浏览建议：</strong>从 <a href="1-轮胎卡片列表.html" style="color:#165DFF;">列表</a> 进入；财务类：<a href="7-创建报销单.html" style="color:#165DFF;">报销</a>、工具栏 <strong>创建收据</strong>、<a href="6-轮胎售卖.html" style="color:#165DFF;">售卖</a>（自动收据）。
+    </div>
+  </div>
+</body>
+</html>

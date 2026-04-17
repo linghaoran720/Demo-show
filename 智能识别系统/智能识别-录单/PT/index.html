@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能录单助手 · 双端同链演示</title>
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --c-primary: #165DFF;
+    --c-primary-hover: #4080FF;
+    --c-nav: #2B2B6E;
+    --c-text: #1D2129;
+    --c-sub: #4E5969;
+    --c-hint: #86909C;
+    --c-border: #E5E6EB;
+    --c-bg: #F2F3F5;
+    --c-white: #fff;
+    --c-warn-bg: #FFF7E8;
+    --c-warn-border: #FF7D00;
+    --r: 8px;
+    --font: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    background: #E8EAED;
+    color: var(--c-text);
+    min-height: 100vh;
+  }
+
+  .demo-bar {
+    background: linear-gradient(90deg, #1a1a3e 0%, var(--c-nav) 100%);
+    color: #fff;
+    padding: 12px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  }
+  .demo-bar h1 { margin: 0; font-size: 16px; font-weight: 600; }
+  .demo-bar p {
+    margin: 0;
+    font-size: 13px;
+    opacity: .88;
+    max-width: 820px;
+    line-height: 1.5;
+  }
+  .demo-bar .tag {
+    font-size: 11px;
+    background: rgba(255,255,255,.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .demo-bar .demo-load-btn {
+    margin-left: auto;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.4);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .demo-bar .demo-load-btn:hover { background: rgba(255,255,255,.28); }
+
+  .dual-stage {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 28px;
+    padding: 24px 16px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .stage-label {
+    font-size: 12px;
+    color: var(--c-hint);
+    margin-bottom: 10px;
+    font-weight: 500;
+    letter-spacing: .02em;
+  }
+
+  .phone-wrap { flex: 0 0 auto; }
+  .phone-mockup {
+    width: 375px;
+    max-width: 100%;
+    background: #1f1f1f;
+    border-radius: 40px;
+    padding: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.28);
+    position: relative;
+  }
+  .phone-mockup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 28px;
+    background: #1f1f1f;
+    border-radius: 0 0 18px 18px;
+    z-index: 5;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 680px;
+    background: var(--c-white);
+    border-radius: 32px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .m-header {
+    flex-shrink: 0;
+    height: 48px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-white);
+    padding-top: 8px;
+  }
+  .m-header .title { font-size: 15px; font-weight: 600; }
+  .m-header .sub { font-size: 11px; color: var(--c-hint); }
+  .m-header .m-clear-top {
+    font-size: 12px;
+    color: var(--c-primary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-family: inherit;
+  }
+  .m-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    background: var(--c-bg);
+  }
+
+  /* 移动端：缩略图条（§6.4.2 输入区上方） */
+  .m-thumbs {
+    display: none;
+    flex-shrink: 0;
+    gap: 8px;
+    padding: 8px 12px 0;
+    overflow-x: auto;
+    border-top: 1px solid var(--c-border);
+    background: var(--c-white);
+    align-items: center;
+  }
+  .m-thumbs.has-files { display: flex; }
+  .thumb-item {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    border: 1px solid var(--c-border);
+    position: relative;
+    overflow: hidden;
+    background: var(--c-bg);
+    font-size: 10px;
+    color: var(--c-hint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4px;
+    word-break: break-all;
+  }
+  .thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .thumb-item .thumb-x {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    padding: 0;
+  }
+  .thumb-add {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border: 1px dashed var(--c-border);
+    border-radius: 6px;
+    background: var(--c-bg);
+    color: var(--c-hint);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .thumb-add:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* 移动端底部条：相机 + 输入 + 提交（§6.4.1 / 6.4.4） */
+  .m-input-zone {
+    flex-shrink: 0;
+    border-top: 1px solid var(--c-border);
+    background: var(--c-white);
+  }
+  .m-compose {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 10px 12px 12px;
+  }
+  .m-cam {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--c-border);
+    background: var(--c-bg);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.15;
+    padding: 2px 4px;
+  }
+  .m-cam:disabled { opacity: .45; cursor: not-allowed; }
+  .m-compose textarea {
+    flex: 1;
+    min-height: 40px;
+    max-height: 88px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    padding: 8px 10px;
+    font-size: 14px;
+    resize: none;
+    font-family: inherit;
+  }
+  .m-compose textarea:focus { outline: none; border-color: var(--c-primary); }
+  .m-compose textarea:disabled { background: #FAFAFA; color: var(--c-hint); }
+  .m-submit-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--c-primary);
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+    display: none;
+  }
+  .m-submit-icon.show { display: flex; align-items: center; justify-content: center; }
+  .m-submit-icon:disabled { opacity: .45; cursor: not-allowed; }
+  .m-hint-row {
+    font-size: 11px;
+    color: var(--c-hint);
+    padding: 0 12px 8px;
+  }
+
+  .pc-wrap {
+    flex: 1 1 520px;
+    min-width: 280px;
+    max-width: 820px;
+  }
+  .pc-shell {
+    background: var(--c-white);
+    border-radius: var(--r);
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 680px;
+  }
+  .pc-top {
+    height: 48px;
+    background: var(--c-nav);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .pc-top .logo {
+    font-weight: 600;
+    padding-right: 12px;
+    border-right: 1px solid rgba(255,255,255,.2);
+  }
+  .pc-top .crumb { opacity: .85; font-size: 13px; }
+  .pc-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    background: var(--c-bg);
+  }
+  .pc-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 12px;
+  }
+  .pc-thread {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--c-white);
+    border-radius: var(--r);
+    border: 1px solid var(--c-border);
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* PC：附件列表（§6.5.2） */
+  .pc-attach-panel {
+    background: var(--c-white);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    display: none;
+  }
+  .pc-attach-panel.has-files { display: block; }
+  .pc-attach-panel .label { color: var(--c-hint); margin-bottom: 6px; }
+  .pc-file-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--c-bg);
+    border-radius: 4px;
+    border: 1px solid var(--c-border);
+    max-width: 100%;
+  }
+  .file-chip .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+  .file-chip button {
+    border: none;
+    background: none;
+    color: var(--c-hint);
+    cursor: pointer;
+    padding: 0 2px;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .file-chip .type-ico { font-size: 14px; opacity: .75; }
+
+  .pc-input-stack {
+    background: var(--c-white);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .pc-input-stack textarea {
+    width: 100%;
+    min-height: 72px;
+    border: none;
+    padding: 10px 12px;
+    font-size: 14px;
+    resize: vertical;
+    font-family: inherit;
+    display: block;
+  }
+  .pc-input-stack textarea:focus { outline: none; }
+  .pc-input-stack textarea:disabled { background: #FAFAFA; color: var(--c-hint); }
+
+  /* PC 工具条 §6.5.1 */
+  .pc-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--c-border);
+    background: #FAFBFC;
+  }
+  .pc-toolbar .grow { flex: 1; min-width: 8px; }
+  .tb-btn {
+    border: 1px solid var(--c-border);
+    background: var(--c-white);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--c-sub);
+    white-space: nowrap;
+  }
+  .tb-btn:hover { border-color: var(--c-primary); color: var(--c-primary); }
+  .tb-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .tb-btn.primary {
+    background: var(--c-primary);
+    color: #fff;
+    border-color: var(--c-primary);
+  }
+  .tb-btn.primary:hover { background: var(--c-primary-hover); border-color: var(--c-primary-hover); color: #fff; }
+  .tb-btn.primary:disabled { opacity: .45; }
+
+  .bubble {
+    max-width: 92%;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .bubble.user {
+    margin-left: auto;
+    background: #E8F3FF;
+    color: var(--c-text);
+  }
+  .bubble.bot {
+    margin-right: auto;
+    background: var(--c-white);
+    border: 1px solid var(--c-border);
+    color: var(--c-sub);
+  }
+  .bubble .sub-note {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--c-hint);
+  }
+  .bubble-wrap { display: flex; flex-direction: column; }
+
+  .card-group {
+    background: var(--c-white);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    padding: 10px 12px;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .card-group .row { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--c-sub); }
+  .card-group .row strong { color: var(--c-text); }
+  .warn-strip {
+    background: var(--c-warn-bg);
+    border: 1px solid var(--c-warn-border);
+    color: #D25F00;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+  .card-group .btn-row { margin-top: 10px; display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* 多单：运单组（§4.1 / §6.1） */
+  .group-block { margin-top: 10px; }
+  .group-block:first-of-type { margin-top: 8px; }
+  .group-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--c-text);
+  }
+  .group-head .chk { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; }
+  .group-head .chk input { accent-color: var(--c-primary); }
+  .group-head .build-badge {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--c-primary);
+    background: #E8F3FF;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .group-route {
+    font-size: 12px;
+    color: var(--c-sub);
+    line-height: 1.45;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: var(--c-bg);
+    border-radius: 6px;
+    border: 1px solid var(--c-border);
+  }
+  .item-list { display: flex; flex-direction: column; gap: 10px; }
+  .sub-card {
+    border: 1px dashed var(--c-border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #FAFBFC;
+  }
+  .sub-card-title { font-size: 13px; font-weight: 600; color: var(--c-text); margin-bottom: 8px; }
+  .sub-card .meta-line { font-size: 12px; color: var(--c-hint); margin-top: 6px; }
+  .sub-card .plate-note { font-size: 11px; color: var(--c-primary); margin-top: 4px; }
+
+  /* 运单组卡片：参考现网两列表格 + 右上角建单数 */
+  .waybill-card { padding: 0; overflow: hidden; }
+  .waybill-card .group-head {
+    padding: 10px 12px;
+    margin: 0;
+    border-bottom: 1px solid var(--c-border);
+    background: #FAFBFC;
+  }
+  .waybill-card .build-count-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--c-sub);
+  }
+  .waybill-card .build-count-box input {
+    width: 44px;
+    height: 26px;
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .group-meta-line {
+    font-size: 12px;
+    color: var(--c-hint);
+    padding: 8px 12px;
+    line-height: 1.45;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-bg);
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 8px 10px 10px;
+    background: #F7F8FA;
+    font-size: 12px;
+  }
+  .fg-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 6px;
+    border-bottom: 1px solid #ECEEF0;
+  }
+  .fg-lab { color: var(--c-hint); font-size: 11px; }
+  .fg-val { color: var(--c-text); font-weight: 500; word-break: break-all; min-height: 18px; }
+  .fg-val:empty::before { content: '—'; color: #C9CDD4; font-weight: 400; }
+  .fg-inp {
+    width: 100%;
+    border: 1px solid var(--c-primary);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #fff;
+  }
+  .fg-cell.fg-err .fg-lab { color: #D32029; }
+  .fg-cell.fg-err .fg-inp {
+    border-color: #D32029;
+    background: #FFFBFA;
+  }
+  .waybill-card.editing { box-shadow: 0 0 0 2px rgba(22,93,255,.25); }
+  .waybill-card.build-locked {
+    opacity: 0.96;
+    background: #FAFAFA;
+  }
+  .waybill-card.build-locked .group-head { background: #F0F2F5; }
+  .build-locked-badge {
+    font-size: 11px;
+    font-weight: 500;
+    color: #00B42A;
+    background: #E8FFEA;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+  }
+  .build-locked-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .build-locked-count {
+    font-size: 12px;
+    color: var(--c-sub);
+    font-weight: 500;
+  }
+  .result-footer .btn-confirm-batch.is-hidden { display: none !important; }
+
+  .detached-retry-panel {
+    margin: 10px 0 0;
+    padding: 12px;
+    background: #F7F9FC;
+    border: 1px solid var(--c-primary);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(22,93,255,.08);
+  }
+  .detached-retry-hint {
+    font-size: 12px;
+    color: var(--c-sub);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .detached-retry-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .detached-retry-actions .btn-confirm-batch {
+    margin: 0;
+  }
+  .waybill-card.detached-inline {
+    margin-top: 0;
+    border-color: #BEDAFF;
+  }
+  .card-foot-link {
+    padding: 8px 12px;
+    text-align: right;
+    border-top: 1px solid var(--c-border);
+    background: var(--c-white);
+  }
+  .link-edit {
+    border: none;
+    background: none;
+    color: var(--c-primary);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .link-edit:hover { text-decoration: underline; }
+  .link-fail-mod {
+    color: var(--c-primary);
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 6px;
+  }
+
+  /* 识别结果底部：吐槽 + 确定建单(N单) — PRD §6.6 */
+  .result-footer {
+    margin-top: 12px;
+    padding: 12px;
+    background: linear-gradient(180deg, #F5F0FF 0%, #EDE8FF 100%);
+    border-radius: 10px;
+    border: 1px solid #D4C4F5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .feedback-row { display: flex; gap: 8px; align-items: center; }
+  .btn-tucao {
+    border: 1px solid var(--c-border);
+    background: var(--c-white);
+    border-radius: 22px;
+    padding: 8px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--c-text);
+    font-family: inherit;
+  }
+  .btn-tucao:hover { border-color: var(--c-primary); color: var(--c-primary); }
+  .tucao-ta {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 120px;
+    padding: 10px 12px;
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .tucao-count {
+    margin-top: 6px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--c-muted, #86909c);
+  }
+  .btn-confirm-batch {
+    border: none;
+    border-radius: 22px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    background: linear-gradient(135deg, #6B4DC3 0%, #5B2FC9 100%);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(91,47,201,.35);
+  }
+  .btn-confirm-batch:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+  .bubble .progress-line {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--c-hint);
+  }
+  .progress-bar-wrap {
+    height: 8px;
+    background: #E5E6EB;
+    border-radius: 4px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #722ED1, #165DFF);
+    border-radius: 4px;
+    transition: width .12s linear;
+  }
+  .build-batch-head {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--c-text);
+  }
+  .build-batch-status {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--c-sub);
+  }
+  .build-batch-outcome {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--c-text);
+  }
+  .build-batch-outcome:first-of-type {
+    margin-top: 10px;
+  }
+  .result-detail { font-size: 13px; line-height: 1.65; white-space: pre-wrap; }
+  .wb-no { font-weight: 600; color: var(--c-text); letter-spacing: .02em; }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: 1px solid var(--c-border);
+    background: var(--c-white);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-sm.primary {
+    background: var(--c-primary);
+    color: #fff;
+    border-color: var(--c-primary);
+  }
+
+  .sync-pulse {
+    animation: pulse 0.35s ease;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(22,93,255,.5); }
+    100% { box-shadow: 0 0 0 8px rgba(22,93,255,0); }
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: rgba(29,33,41,.92);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: var(--r);
+    font-size: 14px;
+    z-index: 1200;
+    opacity: 0;
+    transition: transform .25s ease, opacity .25s ease;
+    pointer-events: none;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* 客户简称扩展弹窗 §5.1 */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--c-white);
+    border-radius: var(--r);
+    width: 640px;
+    max-width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0,0,0,.15);
+  }
+  .modal-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--c-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .modal-head .x {
+    border: none;
+    background: none;
+    font-size: 22px;
+    color: var(--c-hint);
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+  .modal-body { padding: 12px 18px; overflow-y: auto; flex: 1; }
+
+  /* §5.4 识别配置：Tab + 映射单表（示意） */
+  .mapping-tab-bar {
+    display: flex;
+    gap: 4px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--c-border);
+    flex-shrink: 0;
+    background: var(--c-white);
+  }
+  .map-tab {
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--c-sub);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    font-family: inherit;
+  }
+  .map-tab:hover { color: var(--c-text); }
+  .map-tab.active {
+    color: var(--c-primary);
+    font-weight: 600;
+    border-bottom-color: var(--c-primary);
+  }
+  .mapping-body-pad .map-panel { display: none; padding-top: 12px; }
+  .mapping-body-pad .map-panel.active { display: block; }
+  .tag-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    margin: 2px 4px 2px 0;
+  }
+  .tag-y { background: #FFF8E6; color: #8A6D00; border: 1px solid #FFE4A3; }
+  .tag-b { background: #E8F4FF; color: #165DFF; border: 1px solid #BEDAFF; }
+  .tag-p { background: #F5E8FF; color: #722ED1; border: 1px solid #D3ADF7; }
+  .tag-g { background: #E8FFFB; color: #00897B; border: 1px solid #87E8DE; }
+  .tag-pin { background: #FFF0F6; color: #C41D7F; border: 1px solid #FFADD2; }
+  .map-rules-hint {
+    font-size: 12px;
+    color: var(--c-hint);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+  .map-unified-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+  }
+  .map-unified-table th,
+  .map-unified-table td {
+    border: 1px solid var(--c-border);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .map-unified-table th {
+    background: var(--c-bg);
+    font-weight: 600;
+    color: var(--c-sub);
+  }
+  .map-unified-table .col-aliases { width: 32%; }
+  .map-unified-table .col-sys { width: 22%; }
+  .map-unified-table .col-usage { width: 12%; white-space: nowrap; }
+  .map-unified-table .col-date { width: 14%; white-space: nowrap; }
+  .map-unified-table .col-del { width: 72px; text-align: center; vertical-align: middle; }
+  .map-alias-cell-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .map-alias-tag {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 8px 3px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    background: #E8F4FF;
+    color: #165DFF;
+    border: 1px solid #BEDAFF;
+    max-width: 100%;
+    word-break: break-all;
+  }
+  .map-alias-tag .map-alias-x {
+    display: none;
+    border: none;
+    background: rgba(22,93,255,.12);
+    color: #165DFF;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 4px;
+    border-radius: 4px;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .map-alias-tag:hover .map-alias-x { display: inline-block; }
+  .map-alias-add {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px dashed var(--c-primary);
+    background: #F5F9FF;
+    color: var(--c-primary);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 0;
+    font-family: inherit;
+    font-weight: 300;
+  }
+  .map-alias-add:hover { background: #E8F4FF; }
+  .map-alias-input {
+    flex: 1;
+    min-width: 100px;
+    max-width: 180px;
+    padding: 4px 8px;
+    border: 1px solid var(--c-primary);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+  }
+  .map-sys-select {
+    width: 100%;
+    max-width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--c-white);
+    color: var(--c-text);
+  }
+  .map-sys-select:focus { outline: none; border-color: var(--c-primary); }
+  .usage-cell { min-width: 0; color: var(--c-sub); }
+  .map-del {
+    color: #F53F3F;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+    font-family: inherit;
+    padding: 0;
+  }
+  .map-page-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--c-hint);
+  }
+  .config-tab-intro {
+    margin: 0 0 14px;
+    padding: 10px 12px;
+    background: #f7f8fa;
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--c-text);
+  }
+  .config-tab-intro strong { color: var(--c-sub); }
+  .map-sub-h {
+    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--c-sub);
+  }
+  .map-sub-h:first-of-type { margin-top: 0; }
+  .map-add-rule-row { margin-top: 10px; }
+  .map-add-rule-row button {
+    border: 1px dashed var(--c-primary);
+    background: #F5F9FF;
+    color: var(--c-primary);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
+  .modal-foot {
+    padding: 12px 18px;
+    border-top: 1px solid var(--c-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .shortcut-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .shortcut-table th,
+  .shortcut-table td {
+    border: 1px solid var(--c-border);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  .shortcut-table th {
+    background: var(--c-bg);
+    color: var(--c-sub);
+    font-weight: 600;
+  }
+  .shortcut-table input, .shortcut-table textarea {
+    width: 100%;
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .shortcut-table textarea { min-height: 52px; resize: vertical; }
+  .shortcut-table .col-op { width: 72px; text-align: center; }
+  .shortcut-table .btn-del {
+    color: #F53F3F;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+    padding: 0;
+    font-family: inherit;
+  }
+  .modal-add-row { margin-top: 10px; }
+  .modal-add-row button {
+    border: 1px dashed var(--c-primary);
+    background: #F5F9FF;
+    color: var(--c-primary);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
+  @media (max-width: 900px) {
+    .dual-stage { flex-direction: column; align-items: stretch; }
+    .phone-mockup { margin: 0 auto; }
+    .pc-wrap { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="demo-bar">
+  <h1>智能录单助手 · 双端同链演示</h1>
+  <span class="tag">对齐 PRD §6.4 / §6.5 / §5</span>
+  <p>同一链接双端同步。<strong>确定建单</strong>为<strong>单条助手气泡</strong>：先约 2 秒进度条（无「好的，财财收到」寒暄），结束后<strong>同气泡内</strong>切换为各组建单成功/失败文案，减少会话条数。失败气泡<strong>点击修改</strong>：该运单组卡片<strong>从原识别区移出</strong>，<strong>紧跟该气泡下方</strong>展示（就地编辑 + 本块<strong>确定建单</strong>）。成功后卡片回到识别区为<strong>已建单锁定</strong>。</p>
+  <button type="button" class="demo-load-btn" id="loadPrdCase" title="填入 PRD 多单演示正文">载入 PRD 多单案例</button>
+</header>
+
+<main class="dual-stage">
+  <div class="phone-wrap">
+    <div class="stage-label">移动端 §6.4 · 拍照/相册多图 + 文本 + 提交显隐</div>
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="m-header">
+          <div>
+            <div class="title">财财 · 智能录单</div>
+            <div class="sub">运单文本识别</div>
+          </div>
+          <button type="button" class="m-clear-top" id="mClear">清空</button>
+        </div>
+        <div class="m-messages" id="mMessages"></div>
+        <div class="m-input-zone">
+          <div class="m-thumbs" id="mThumbs"></div>
+          <div class="m-compose">
+            <button type="button" class="m-cam" id="mCam" title="拍照/相册" aria-label="拍照或相册">相机</button>
+            <textarea id="mInput" placeholder="在此处粘贴或输入运单信息" rows="2"></textarea>
+            <button type="button" class="m-submit-icon" id="mSend" title="提交识别" aria-label="提交">↑</button>
+          </div>
+          <div class="m-hint-row">无图且无字时不显示提交；识别中相机与提交不可用。</div>
+        </div>
+        <input type="file" id="mFile" accept="image/*" multiple hidden>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc-wrap">
+    <div class="stage-label">PC Web §6.5 · 底栏：<strong>识别配置</strong>（简称 + 映射）+ 清空 + 文件 + 发送</div>
+    <div class="pc-shell">
+      <div class="pc-top">
+        <span class="logo">G 财运通</span>
+        <span class="crumb">创建运单 · 智能录单助手</span>
+      </div>
+      <div class="pc-body">
+        <div class="pc-main">
+          <div class="pc-thread" id="pcThread"></div>
+          <div class="pc-attach-panel" id="pcAttachPanel">
+            <div class="label">已选文件（PNG/JPG、Excel、PDF，演示）</div>
+            <div class="pc-file-chips" id="pcFileChips"></div>
+          </div>
+          <div class="pc-input-stack">
+            <textarea id="pcInput" placeholder="在这里输入运单描述信息，shift + 回车 = 换行" rows="3"></textarea>
+            <div class="pc-toolbar">
+              <button type="button" class="tb-btn" id="btnRecognitionConfig">识别配置</button>
+              <button type="button" class="tb-btn" id="pcClear">清空</button>
+              <span class="grow"></span>
+              <button type="button" class="tb-btn" id="pcFileBtn">文件</button>
+              <button type="button" class="tb-btn primary" id="pcSend">发送</button>
+            </div>
+          </div>
+          <input type="file" id="pcFile" multiple accept=".png,.jpg,.jpeg,.xlsx,.xls,.pdf,image/*,application/pdf" hidden>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="modalRecognitionConfig" role="dialog" aria-modal="true" aria-labelledby="recConfigTitle">
+  <div class="modal-box" style="width:960px;max-width:100%;max-height:92vh">
+    <div class="modal-head">
+      <h2 id="recConfigTitle">识别配置</h2>
+      <button type="button" class="x" id="recConfigCloseX" aria-label="关闭">×</button>
+    </div>
+    <div class="mapping-tab-bar">
+      <button type="button" class="map-tab active" data-panel="recPanelShortcut">简称配置</button>
+      <button type="button" class="map-tab" data-panel="recPanelMapping">映射配置</button>
+    </div>
+    <div class="modal-body mapping-body-pad" style="padding-top:0;flex:1;min-height:0">
+      <div id="recPanelShortcut" class="map-panel active">
+        <div class="config-tab-intro">
+          <strong>简称配置说明</strong>：对于长期固定的业务，可以设置一个特定简称。例如左侧维护简称「25年G7项目」，右侧展开说明填写「客户：G7、项目：硬件设备、装货地北京海淀、卸货地广州佛山」；当你在对话中说「25年G7项目」时，助手会将右侧信息合并进识别上下文，快速辅助创建运单。
+        </div>
+        <table class="shortcut-table">
+          <thead>
+            <tr>
+              <th class="col-op">操作</th>
+              <th style="width:48px">序号</th>
+              <th style="width:22%">简称</th>
+              <th>展开说明</th>
+            </tr>
+          </thead>
+          <tbody id="shortcutRows"></tbody>
+        </table>
+        <div class="modal-add-row">
+          <button type="button" id="shortcutAdd">+ 添加</button>
+        </div>
+      </div>
+      <div id="recPanelMapping" class="map-panel">
+        <div class="config-tab-intro">
+          <strong>映射配置说明</strong>：左侧配置「车」「车牌」等识别侧说法、右侧选择系统字段「车牌号」时，当导入表格的列标题为「车」或「车牌」等时，自动映射到系统「车牌号」字段。<strong>智能映射</strong>须结合<strong>列标题与单元格内容</strong>综合判断；对「12345测试」等与业务语义、列内容<strong>无关联</strong>的噪声<strong>不自动写入映射规则</strong>，<strong>除非用户手动添加</strong>。导入时系统自动判断映射；保存识别结果或确认映射时可按产品规则<strong>自动更新映射表</strong>（与平台 F004 / F005 / F010 一致）。
+        </div>
+        <p class="map-rules-hint" style="margin-top:0">以下为示意界面。<strong>系统字段</strong>下拉选项与<strong>创建运单 · 运单模板配置</strong>字段同源（演示为静态列表）。完整规则见 PRD F004、F010 / 知识库 §8.4。</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <span style="font-size:12px;color:var(--c-sub)">共 <strong id="mapRuleCount">10</strong> 条规则</span>
+          <input type="search" placeholder="按识别字段 / 系统字段搜索（演示）" style="flex:1;min-width:200px;max-width:320px;padding:6px 10px;border:1px solid var(--c-border);border-radius:6px;font-size:12px" id="mapSearchDemo" readonly title="演示占位">
+        </div>
+        <table class="map-unified-table">
+          <thead>
+            <tr>
+              <th class="col-aliases">识别字段<br><span style="font-weight:400;color:var(--c-hint);font-size:11px">可点 + 输入后回车添加；悬停标签可删单项</span></th>
+              <th class="col-sys">系统字段<br><span style="font-weight:400;color:var(--c-hint);font-size:11px">运单模板配置字段</span></th>
+              <th class="col-usage">使用次数</th>
+              <th class="col-date">最近使用</th>
+              <th class="col-del">操作</th>
+            </tr>
+          </thead>
+          <tbody id="mapUnifiedRows"></tbody>
+        </table>
+        <div class="map-page-row">
+          <span id="mapPageHint">共 10 条，每页 20 条</span>
+          <span>上一页 · <strong>1</strong> · 下一页</span>
+        </div>
+        <div class="map-add-rule-row">
+          <button type="button" id="mapAddRuleRow">+ 添加映射规则</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="tb-btn" id="shortcutCancel">取消</button>
+      <button type="button" class="tb-btn primary" id="shortcutOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalMapRuleDeleteConfirm" role="dialog" aria-modal="true" aria-labelledby="mapRuleDelTitle" style="z-index:1100">
+  <div class="modal-box" style="width:420px;max-width:96vw">
+    <div class="modal-head">
+      <h2 id="mapRuleDelTitle" style="margin:0;font-size:16px;font-weight:600">删除映射规则</h2>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0;font-size:14px;line-height:1.65;color:var(--c-text)">删除后不可恢复</p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="tb-btn" id="mapRuleDelCancel">取消</button>
+      <button type="button" class="tb-btn primary" id="mapRuleDelOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="tucaoOverlay" aria-hidden="true">
+  <div class="modal-box" style="width:480px;max-width:96vw">
+    <div class="modal-head">
+      <h2>吐槽</h2>
+      <button type="button" class="x" id="tucaoClose" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="tucaoText" class="tucao-ta" maxlength="500" rows="5" placeholder="请描述识别不准、体验问题等（最多500字）"></textarea>
+      <div class="tucao-count"><span id="tucaoCount">0</span>/500</div>
+      <p style="margin:10px 0 0;font-size:12px;color:var(--c-muted,#86909c)">演示：提交后控制台输出落库字段（集团ID、用户名、手机号、正文）。</p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="tb-btn" id="tucaoCancel">取消</button>
+      <button type="button" class="tb-btn primary" id="tucaoSubmit">提交</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var uid = 0;
+  function nextId() { return 'a' + (++uid); }
+
+  /** PRD §2.2 典型场景 1+2+3+5 合成：简称、同装同卸三车（×2/*3/片段车牌）、第二组装卸不同 */
+  var PRD_MULTI_DEMO_TEXT =
+    '北京白钢\n' +
+    '组1-装北京顺义XX物流园，卸唐山丰南经济开发区，货白钢卷28吨/车。\n' +
+    '京B99880 司机李强 13812340001 ×2\n' +
+    '冀B88765 王师傅 13700001111 *3\n' +
+    '车牌后五位00123 赵四 运费6500\n' +
+    '\n' +
+    '组2-装天津滨海物流园，卸沧州高新区，货螺纹钢32吨。\n' +
+    '鲁C99999 孙七 13922223333';
+
+  var state = {
+    messages: [],
+    hasGroup: false,
+    lastGroups: [],
+    lastResultMsgIndex: -1,
+    attachments: [],
+    shortcuts: [
+      { shortcut: '北京白钢', expansion: '车线：北京钢厂→唐山库；客户：华北钢贸；货名：白钢卷；单价口径按合同执行。' }
+    ],
+    /** §5.4 映射配置：一行 = 多识别别名 → 一个系统字段（演示数据） */
+    mappingRules: [
+      { id: 'mr1', aliases: ['客户名称', '发货方', '发货单位'], systemField: '客户名称', usage: 156, lastUsed: '2026-03-24' },
+      { id: 'mr2', aliases: ['车牌', '车辆牌照', '车'], systemField: '车牌号', usage: 132, lastUsed: '2026-03-24' },
+      { id: 'mr3', aliases: ['挂', '挂车'], systemField: '挂车牌号', usage: 61, lastUsed: '2026-03-23' },
+      { id: 'mr4', aliases: ['发货地址', '起运地'], systemField: '高德地址（发）', usage: 203, lastUsed: '2026-03-24' },
+      { id: 'mr5', aliases: ['收货地址', '到货地址'], systemField: '高德地址（收）', usage: 198, lastUsed: '2026-03-23' },
+      { id: 'mr6', aliases: ['货物名称', '品名'], systemField: '货物名称', usage: 145, lastUsed: '2026-03-22' },
+      { id: 'mr7', aliases: ['货物重量', '重量'], systemField: '重量(kg)', usage: 89, lastUsed: '2026-03-21' },
+      { id: 'mr8', aliases: ['司机', '驾驶员'], systemField: '主驾司机', usage: 76, lastUsed: '2026-03-20' },
+      { id: 'mr9', aliases: ['油费金额'], systemField: '油费', usage: 50, lastUsed: '2026-03-18' },
+      { id: 'mr10', aliases: ['路桥费', '高速费'], systemField: '路桥费', usage: 40, lastUsed: '2026-03-15' }
+    ],
+    recognizing: false,
+    tucaoMsgIndex: -1
+  };
+
+  /** 与「创建运单 · 运单模板配置」字段同源（演示静态列表） */
+  var WAYBILL_TEMPLATE_FIELDS = [
+    '客户名称',
+    '车牌号',
+    '挂车牌号',
+    '主驾司机',
+    '主驾司机电话',
+    '副驾司机',
+    '副驾司机电话',
+    '装货地',
+    '卸货地',
+    '车线名称',
+    '高德地址（发）',
+    '高德地址（收）',
+    '货物名称',
+    '重量(kg)',
+    '件数',
+    '货值',
+    '计划发车时间',
+    '装车时间',
+    '运单号',
+    '运费/应收',
+    '油费',
+    '路桥费',
+    '押运员电话'
+  ];
+
+  var mapRuleUid = 100;
+  function nextMapRuleId() {
+    return 'mr' + (++mapRuleUid);
+  }
+
+  var mapUnifiedRowsEl = null;
+  var mapRuleCountEl = null;
+  var mapPageHintEl = null;
+  var modalMapRuleDel = null;
+  var pendingMapRuleDeleteId = null;
+  var mapAliasInputRowId = null;
+
+  var mMessages = document.getElementById('mMessages');
+  var pcThread = document.getElementById('pcThread');
+  var mInput = document.getElementById('mInput');
+  var pcInput = document.getElementById('pcInput');
+  var mThumbs = document.getElementById('mThumbs');
+  var mCam = document.getElementById('mCam');
+  var mSend = document.getElementById('mSend');
+  var mFile = document.getElementById('mFile');
+  var pcSend = document.getElementById('pcSend');
+  var pcFileBtn = document.getElementById('pcFileBtn');
+  var pcFile = document.getElementById('pcFile');
+  var pcAttachPanel = document.getElementById('pcAttachPanel');
+  var pcFileChips = document.getElementById('pcFileChips');
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  var modal = document.getElementById('modalRecognitionConfig');
+  var shortcutRows = document.getElementById('shortcutRows');
+  mapUnifiedRowsEl = document.getElementById('mapUnifiedRows');
+  mapRuleCountEl = document.getElementById('mapRuleCount');
+  mapPageHintEl = document.getElementById('mapPageHint');
+  modalMapRuleDel = document.getElementById('modalMapRuleDeleteConfirm');
+
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  }
+
+  function setInput(v) {
+    mInput.value = v;
+    pcInput.value = v;
+    refreshSubmitState();
+  }
+
+  function canSubmit() {
+    var t = mInput.value.trim();
+    return state.attachments.length > 0 || t.length > 0;
+  }
+
+  function refreshSubmitState() {
+    var ok = canSubmit() && !state.recognizing;
+    mSend.classList.toggle('show', canSubmit());
+    mSend.disabled = state.recognizing;
+    mCam.disabled = state.recognizing;
+    mFile.disabled = state.recognizing;
+    pcSend.disabled = !ok;
+    pcFileBtn.disabled = state.recognizing;
+    document.querySelector('.thumb-add') && (document.querySelector('.thumb-add').disabled = state.recognizing);
+  }
+
+  function fileIcon(name) {
+    var lower = (name || '').toLowerCase();
+    if (/\.(png|jpg|jpeg|gif|webp)$/.test(lower)) return '图';
+    if (/\.(xlsx|xls)$/.test(lower)) return '表';
+    if (/\.pdf$/.test(lower)) return 'PDF';
+    return '件';
+  }
+
+  function revokeAttachment(att) {
+    if (att.url) try { URL.revokeObjectURL(att.url); } catch (e) {}
+  }
+
+  function removeAttachment(id) {
+    state.attachments = state.attachments.filter(function (a) {
+      if (a.id === id) { revokeAttachment(a); return false; }
+      return true;
+    });
+    renderAttachments();
+    refreshSubmitState();
+  }
+
+  function addFilesFromInput(fileList) {
+    var files = Array.prototype.slice.call(fileList || []);
+    files.forEach(function (f) {
+      var id = nextId();
+      var byMime = f.type && /^image\//.test(f.type);
+      var byName = /\.(png|jpg|jpeg|gif|webp)$/i.test(f.name || '');
+      var isImage = byMime || byName;
+      var item = { id: id, name: f.name, file: f, isImage: isImage };
+      if (isImage) item.url = URL.createObjectURL(f);
+      state.attachments.push(item);
+    });
+    renderAttachments();
+    refreshSubmitState();
+  }
+
+  function renderAttachments() {
+    mThumbs.innerHTML = '';
+    mThumbs.classList.toggle('has-files', state.attachments.length > 0);
+
+    state.attachments.forEach(function (att) {
+      var div = document.createElement('div');
+      div.className = 'thumb-item';
+      if (att.url) {
+        var img = document.createElement('img');
+        img.src = att.url;
+        img.alt = '';
+        div.appendChild(img);
+      } else {
+        div.textContent = fileIcon(att.name);
+      }
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'thumb-x';
+      x.textContent = '×';
+      x.onclick = function () { removeAttachment(att.id); };
+      div.appendChild(x);
+      mThumbs.appendChild(div);
+    });
+
+    if (!state.recognizing) {
+      var add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'thumb-add';
+      add.textContent = '+';
+      add.title = '继续加图';
+      add.onclick = function () { mFile.click(); };
+      mThumbs.appendChild(add);
+    }
+
+    pcFileChips.innerHTML = '';
+    pcAttachPanel.classList.toggle('has-files', state.attachments.length > 0);
+    state.attachments.forEach(function (att) {
+      var chip = document.createElement('span');
+      chip.className = 'file-chip';
+      chip.innerHTML = '<span class="type-ico">' + fileIcon(att.name) + '</span><span class="name" title="' + escapeHtml(att.name) + '">' + escapeHtml(att.name) + '</span>';
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.textContent = '×';
+      rm.onclick = function () { removeAttachment(att.id); };
+      chip.appendChild(rm);
+      pcFileChips.appendChild(chip);
+    });
+  }
+
+  function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function findHitShortcuts(text) {
+    var hits = [];
+    var t = text || '';
+    state.shortcuts.forEach(function (s) {
+      if (!s.shortcut) return;
+      if (t.indexOf(s.shortcut) !== -1) hits.push(s);
+    });
+    return hits;
+  }
+
+  /** 与文首载入案例同特征，便于识别多单演示 */
+  function isPrdMultiDemoText(text) {
+    var t = text || '';
+    return t.indexOf('北京顺义XX物流园') !== -1 && t.indexOf('天津滨海物流园') !== -1;
+  }
+
+  function makeWaybillGroup(idx, o) {
+    return {
+      index: idx,
+      title: '运单组 ' + idx,
+      selected: true,
+      buildCount: o.buildCount != null ? o.buildCount : 1,
+      loadAddr: o.loadAddr || '',
+      unloadAddr: o.unloadAddr || '',
+      routeName: o.routeName || '',
+      fields: (function () {
+        var est = o.planDepart || o.estimated_departure || '';
+        return {
+          loading_place: o.loadAddr || '',
+          unloading_place: o.unloadAddr || '',
+          route_name: o.routeName || '',
+          plate_no: o.plate || '',
+          estimated_departure: est,
+          driverName: o.driverName || '',
+          plate: o.plate || '',
+          coDriverName: o.coDriverName || '',
+          coDriverPhone: o.coDriverPhone || '',
+          weight: o.weight || '',
+          cargoName: o.cargoName || '',
+          driverPhone: o.driverPhone || '',
+          escortPhone: o.escortPhone || '',
+          loadTime: o.loadTime || '',
+          planDepart: est,
+          waybillNo: o.waybillNo || '',
+          trailerNo: o.trailerNo || '',
+          freight: o.freight || '',
+          pieceCount: o.pieceCount || '',
+          cargoValue: o.cargoValue || ''
+        };
+      })(),
+      warnVehicle: !!o.warnVehicle,
+      warnDriver: !!o.warnDriver,
+      plateNote: o.plateNote || ''
+    };
+  }
+
+  function buildDemoResult(hits, rawText) {
+    var hitLine = '';
+    if (hits.length) {
+      hitLine = '已命中客户简称：「' + hits.map(function (h) { return h.shortcut; }).join('」「') + '」，已按展开说明合并进识别上下文（§5.2）。\n';
+    }
+    if (isPrdMultiDemoText(rawText)) {
+      return {
+        text: hitLine +
+          '识别结果如下：\n' +
+          '本次共解析出 7 条运单，分为 4 个运单组。分组规则：装货地、卸货地、车线名称、车牌号、司机均一致记为同一运单组；右上角建单数量默认 1，遇 ×N、*N、N 单等解析为 N。',
+        groups: [
+          makeWaybillGroup(1, {
+            buildCount: 2,
+            loadAddr: '北京顺义XX物流园',
+            unloadAddr: '唐山丰南经济开发区',
+            routeName: '北京钢厂→唐山库（命中「北京白钢」简称扩展）',
+            planDepart: '2026-04-14 08:00',
+            driverName: '李强',
+            coDriverName: '刘副驾',
+            plate: '京B99880',
+            driverPhone: '13812340001',
+            cargoName: '白钢卷',
+            weight: '28吨'
+          }),
+          makeWaybillGroup(2, {
+            buildCount: 3,
+            loadAddr: '北京顺义XX物流园',
+            unloadAddr: '唐山丰南经济开发区',
+            routeName: '北京钢厂→唐山库（命中「北京白钢」简称扩展）',
+            planDepart: '2026-04-14 09:30',
+            driverName: '王师傅',
+            plate: '冀B88765',
+            driverPhone: '13700001111',
+            cargoName: '白钢卷',
+            weight: '28吨'
+          }),
+          makeWaybillGroup(3, {
+            buildCount: 1,
+            loadAddr: '北京顺义XX物流园',
+            unloadAddr: '唐山丰南经济开发区',
+            routeName: '北京钢厂→唐山库（命中「北京白钢」简称扩展）',
+            planDepart: '2026-04-14 10:00',
+            driverName: '赵四',
+            plate: '京A00123',
+            plateNote: '§3.1.2 / §2.2 场景5：原文「车牌后五位00123」，车辆库模糊匹配后回显标准车牌。',
+            driverPhone: '',
+            cargoName: '白钢卷',
+            weight: '28吨',
+            freight: '6500.00',
+            warnDriver: true
+          }),
+          makeWaybillGroup(4, {
+            buildCount: 1,
+            loadAddr: '天津滨海物流园',
+            unloadAddr: '沧州高新区',
+            routeName: '天津滨海→沧州高新',
+            planDepart: '2026-04-15 07:00',
+            driverName: '孙七',
+            plate: '鲁C99999',
+            driverPhone: '13922223333',
+            cargoName: '螺纹钢',
+            weight: '32吨',
+            freight: '8200.00',
+            warnVehicle: true
+          })
+        ]
+      };
+    }
+    return {
+      text: hitLine + '识别结果如下：\n本次共解析出 1 条运单，分为 1 个运单组。',
+      groups: [
+        makeWaybillGroup(1, {
+          buildCount: 1,
+          loadAddr: '（未识别）',
+          unloadAddr: '（未识别）',
+          routeName: '（演示）',
+          planDepart: '',
+          driverName: '张三',
+          plate: '京A12345',
+          driverPhone: '138****8000',
+          cargoName: '普货',
+          warnVehicle: true
+        })
+      ]
+    };
+  }
+
+
+  function formatUserPayload(text) {
+    var parts = [];
+    if (text) parts.push(text);
+    if (state.attachments.length) {
+      var names = state.attachments.map(function (a) { return a.name; }).join('、');
+      parts.push('「附件 ' + state.attachments.length + ' 个：' + names + '」');
+    }
+    return parts.join('\n');
+  }
+
+  function pulse(el) {
+    if (!el) return;
+    el.classList.remove('sync-pulse');
+    void el.offsetWidth;
+    el.classList.add('sync-pulse');
+  }
+
+  var FIELD_GRID_DEF = [
+    ['driverName', '司机姓名'],
+    ['plate', '车牌号'],
+    ['weight', '重量'],
+    ['cargoName', '货物名称'],
+    ['driverPhone', '主驾司机手机号'],
+    ['escortPhone', '押运员电话'],
+    ['loadTime', '装车时间'],
+    ['planDepart', '计划发车时间'],
+    ['waybillNo', '运单号'],
+    ['trailerNo', '挂车号'],
+    ['freight', '运费/应收']
+  ];
+
+  function findGroupInMessage(msgIndex, groupIndex1) {
+    var msg = state.messages[msgIndex];
+    if (!msg || !msg.groups) return null;
+    for (var i = 0; i < msg.groups.length; i++) {
+      if (msg.groups[i].index === groupIndex1) return msg.groups[i];
+    }
+    return null;
+  }
+
+  function runDetachedConfirmBuild(recMsgIdx, groupIndex1) {
+    flushInlineEditsForMessage(recMsgIdx);
+    var msg = state.messages[recMsgIdx];
+    if (!msg || !msg.groups) return;
+    msg.groups.forEach(function (g) {
+      if (!g.buildLocked) g.selected = g.index === groupIndex1;
+    });
+    runBatchConfirmBuild(recMsgIdx);
+  }
+
+  /** 建单失败「点击修改」后：卡片迁至失败气泡下方，本区单独「确定建单」 */
+  function buildDetachedRetryPanel(recMsgIdx, group, side, anchorMsgIdx) {
+    var panel = document.createElement('div');
+    panel.className = 'detached-retry-panel';
+    panel.setAttribute('data-detached-rec', String(recMsgIdx));
+    panel.setAttribute('data-detached-g', String(group.index));
+    panel.setAttribute('data-detached-anchor', String(anchorMsgIdx));
+    var hint = document.createElement('p');
+    hint.className = 'detached-retry-hint';
+    hint.innerHTML =
+      '<strong>本组识别内容已移至此处</strong>，上方识别结果区<strong>不再展示</strong>本卡。请在此修改后点<strong>确定建单</strong>（无需滚回顶部）。';
+    panel.appendChild(hint);
+    panel.appendChild(buildGroupCard(group, recMsgIdx, 0, side));
+    var actions = document.createElement('div');
+    actions.className = 'detached-retry-actions';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-confirm-batch';
+    btn.innerHTML = '确定建单(<span class="total-n-d">' + (group.buildCount || 1) + '</span>单)';
+    btn.addEventListener('click', function () {
+      runDetachedConfirmBuild(recMsgIdx, group.index);
+    });
+    actions.appendChild(btn);
+    panel.appendChild(actions);
+    return panel;
+  }
+
+  /** 单条气泡：进行中展示进度，结束后同气泡替换为成功/失败块（PRD §6.3.2～6.3.3） */
+  function fillBuildBatchBubble(b, msg, i) {
+    var bb = msg.buildBatch;
+    b.textContent = '';
+    var head = document.createElement('div');
+    head.className = 'build-batch-head';
+    head.textContent =
+      '本次确定建单，共计' + bb.k + '个运单组，包含' + bb.p + '单运单。';
+    b.appendChild(head);
+    if (bb.phase === 'running') {
+      var st = document.createElement('div');
+      st.className = 'build-batch-status';
+      st.textContent = '正在建单…';
+      b.appendChild(st);
+      var pl = document.createElement('div');
+      pl.className = 'progress-line';
+      pl.textContent =
+        '执行进度 ' + bb.progress.done + '/' + bb.progress.total;
+      var pw = document.createElement('div');
+      pw.className = 'progress-bar-wrap';
+      var pf = document.createElement('div');
+      pf.className = 'progress-bar-fill';
+      var fracBar =
+        typeof bb._animFrac === 'number'
+          ? bb._animFrac
+          : bb.progress.total > 0
+            ? bb.progress.done / bb.progress.total
+            : 1;
+      pf.style.width = Math.min(100, Math.round(fracBar * 100)) + '%';
+      pw.appendChild(pf);
+      b.appendChild(pl);
+      b.appendChild(pw);
+      return;
+    }
+    if (bb.outcomes && bb.outcomes.length) {
+      bb.outcomes.forEach(function (o) {
+        if (o.type === 'success') {
+          var sd = document.createElement('div');
+          sd.className = 'build-batch-outcome';
+          var t = '运单组' + o.groupIndex + '，创建成功：\n';
+          o.nos.forEach(function (n) {
+            t += '****' + n + '****\n';
+          });
+          sd.style.whiteSpace = 'pre-wrap';
+          sd.textContent = t.trim();
+          b.appendChild(sd);
+        } else {
+          var fd = document.createElement('div');
+          fd.className = 'build-batch-outcome';
+          fd.appendChild(
+            document.createTextNode(
+              '运单组' + o.groupIndex + '，创建失败：' + o.reason + '，'
+            )
+          );
+          var a = document.createElement('span');
+          a.className = 'link-fail-mod';
+          a.textContent = '点击修改';
+          a.setAttribute('data-rec-msg', String(o.recMsgIdx));
+          a.setAttribute('data-g-idx', String(o.groupIndex));
+          a.setAttribute('data-fail-msg-idx', String(i));
+          fd.appendChild(a);
+          b.appendChild(fd);
+        }
+      });
+    }
+  }
+
+  function fillBotBubble(b, msg, i) {
+    if (msg.role === 'user') {
+      b.textContent = msg.text || '';
+      return;
+    }
+    if (msg.buildBatch) {
+      fillBuildBatchBubble(b, msg, i);
+      return;
+    }
+    if (msg.successDetail) {
+      var t = '运单组' + msg.successDetail.groupIndex + '，创建成功：\n';
+      msg.successDetail.nos.forEach(function (n) {
+        t += '****' + n + '****\n';
+      });
+      b.textContent = t.trim();
+      return;
+    }
+    if (msg.failDetail) {
+      b.appendChild(document.createTextNode(
+        '运单组' + msg.failDetail.groupIndex + '，创建失败：' + msg.failDetail.reason + '，'
+      ));
+      var a = document.createElement('span');
+      a.className = 'link-fail-mod';
+      a.textContent = '点击修改';
+      a.setAttribute('data-rec-msg', String(msg.failDetail.recMsgIdx));
+      a.setAttribute('data-g-idx', String(msg.failDetail.groupIndex));
+      a.setAttribute('data-fail-msg-idx', String(i));
+      b.appendChild(a);
+      return;
+    }
+    b.textContent = msg.text || '';
+    if (msg.progress) {
+      var pl = document.createElement('div');
+      pl.className = 'progress-line';
+      pl.textContent = '执行进度 ' + msg.progress.done + '/' + msg.progress.total;
+      var pw = document.createElement('div');
+      pw.className = 'progress-bar-wrap';
+      var pf = document.createElement('div');
+      pf.className = 'progress-bar-fill';
+      pf.style.width =
+        msg.progress.total > 0
+          ? Math.round((100 * msg.progress.done) / msg.progress.total) + '%'
+          : '100%';
+      pw.appendChild(pf);
+      b.appendChild(pl);
+      b.appendChild(pw);
+    }
+  }
+
+  function renderMessages() {
+    mMessages.innerHTML = '';
+    pcThread.innerHTML = '';
+
+    state.messages.forEach(function (msg, i) {
+      var wrapM = document.createElement('div');
+      wrapM.className = 'bubble-wrap';
+      var bM = document.createElement('div');
+      bM.className = 'bubble ' + (msg.role === 'user' ? 'user' : 'bot');
+      fillBotBubble(bM, msg, i);
+      wrapM.appendChild(bM);
+      if (msg.groups && msg.role === 'bot') {
+        msg.groups.forEach(function (g, gi) {
+          if (!g.detached) wrapM.appendChild(buildGroupCard(g, i, gi, 'm'));
+        });
+        wrapM.appendChild(buildResultFooter(i));
+      }
+      if (
+        msg.buildBatch &&
+        msg.buildBatch.phase === 'done' &&
+        msg.buildBatch.outcomes
+      ) {
+        msg.buildBatch.outcomes.forEach(function (o) {
+          if (o.type !== 'fail') return;
+          var gDetM = findGroupInMessage(o.recMsgIdx, o.groupIndex);
+          if (gDetM && gDetM.detached && gDetM.detachAfterMsgIdx === i) {
+            wrapM.appendChild(
+              buildDetachedRetryPanel(o.recMsgIdx, gDetM, 'm', i)
+            );
+          }
+        });
+      }
+      if (msg.failDetail && msg.role === 'bot') {
+        var gDetM = findGroupInMessage(msg.failDetail.recMsgIdx, msg.failDetail.groupIndex);
+        if (gDetM && gDetM.detached && gDetM.detachAfterMsgIdx === i) {
+          wrapM.appendChild(buildDetachedRetryPanel(msg.failDetail.recMsgIdx, gDetM, 'm', i));
+        }
+      }
+      mMessages.appendChild(wrapM);
+
+      var wrapP = document.createElement('div');
+      wrapP.className = 'bubble-wrap';
+      var bP = document.createElement('div');
+      bP.className = 'bubble ' + (msg.role === 'user' ? 'user' : 'bot');
+      fillBotBubble(bP, msg, i);
+      wrapP.appendChild(bP);
+      if (msg.groups && msg.role === 'bot') {
+        msg.groups.forEach(function (g, gi) {
+          if (!g.detached) wrapP.appendChild(buildGroupCard(g, i, gi, 'p'));
+        });
+        wrapP.appendChild(buildResultFooter(i));
+      }
+      if (
+        msg.buildBatch &&
+        msg.buildBatch.phase === 'done' &&
+        msg.buildBatch.outcomes
+      ) {
+        msg.buildBatch.outcomes.forEach(function (o) {
+          if (o.type !== 'fail') return;
+          var gDetP = findGroupInMessage(o.recMsgIdx, o.groupIndex);
+          if (gDetP && gDetP.detached && gDetP.detachAfterMsgIdx === i) {
+            wrapP.appendChild(
+              buildDetachedRetryPanel(o.recMsgIdx, gDetP, 'p', i)
+            );
+          }
+        });
+      }
+      if (msg.failDetail && msg.role === 'bot') {
+        var gDetP = findGroupInMessage(msg.failDetail.recMsgIdx, msg.failDetail.groupIndex);
+        if (gDetP && gDetP.detached && gDetP.detachAfterMsgIdx === i) {
+          wrapP.appendChild(buildDetachedRetryPanel(msg.failDetail.recMsgIdx, gDetP, 'p', i));
+        }
+      }
+      pcThread.appendChild(wrapP);
+    });
+
+    refreshFooterCounts();
+    mMessages.scrollTop = mMessages.scrollHeight;
+    pcThread.scrollTop = pcThread.scrollHeight;
+  }
+
+  /** 原识别区底部「确定建单」计数：不含已迁至失败气泡下的 detached 组 */
+  function getSelectedTotalForMessage(msgIndex) {
+    var msg = state.messages[msgIndex];
+    if (!msg || !msg.groups) return 0;
+    var s = 0;
+    msg.groups.forEach(function (g) {
+      if (g.selected && !g.buildLocked && !g.detached) s += g.buildCount || 1;
+    });
+    return s;
+  }
+
+  /** 实际提交建单计数（含 detached 重提区勾选） */
+  function getSubmitTotalForMessage(msgIndex) {
+    var msg = state.messages[msgIndex];
+    if (!msg || !msg.groups) return 0;
+    var s = 0;
+    msg.groups.forEach(function (g) {
+      if (g.selected && !g.buildLocked) s += g.buildCount || 1;
+    });
+    return s;
+  }
+
+  function allGroupsBuildLocked(msg) {
+    if (!msg || !msg.groups || !msg.groups.length) return false;
+    return msg.groups.every(function (g) {
+      return g.buildLocked;
+    });
+  }
+
+  /** 确定建单前：把两侧卡片上正在编辑的输入写回 group.fields（无需先点「完成」） */
+  function flushInlineEditsForMessage(msgIndex) {
+    var msg = state.messages[msgIndex];
+    if (!msg || !msg.groups) return;
+    ['m', 'p'].forEach(function (side) {
+      msg.groups.forEach(function (g) {
+        if (g.buildLocked) return;
+        var card = document.getElementById(side + '-g-' + msgIndex + '-' + g.index);
+        if (!card || !card.classList.contains('editing')) return;
+        card.querySelectorAll('.fg-cell').forEach(function (cell) {
+          var k = cell.getAttribute('data-field-key');
+          var inp = cell.querySelector('.fg-inp');
+          if (inp && k) g.fields[k] = inp.value;
+        });
+        if (g.fields) {
+          if (g.fields.plate != null) g.fields.plate_no = g.fields.plate;
+          if (g.fields.planDepart != null) g.fields.estimated_departure = g.fields.planDepart;
+        }
+      });
+    });
+  }
+
+  function refreshFooterCounts() {
+    document.querySelectorAll('.result-footer').forEach(function (foot) {
+      var idx = parseInt(foot.getAttribute('data-msg-index'), 10);
+      var msg = state.messages[idx];
+      var n = getSelectedTotalForMessage(idx);
+      var span = foot.querySelector('.total-n');
+      if (span) span.textContent = String(n);
+      var btn = foot.querySelector('.btn-confirm-batch');
+      if (!btn) return;
+      var allLocked = msg && allGroupsBuildLocked(msg);
+      btn.classList.toggle('is-hidden', !!allLocked);
+      btn.disabled = n === 0 || !!allLocked;
+    });
+  }
+
+  function buildResultFooter(msgIndex) {
+    var el = document.createElement('div');
+    el.className = 'result-footer';
+    el.setAttribute('data-msg-index', String(msgIndex));
+    var fb = document.createElement('div');
+    fb.className = 'feedback-row';
+    var tucaoBtn = document.createElement('button');
+    tucaoBtn.type = 'button';
+    tucaoBtn.className = 'btn-tucao';
+    tucaoBtn.textContent = '吐槽';
+    tucaoBtn.addEventListener('click', function () {
+      openTucaoModal(msgIndex);
+    });
+    fb.appendChild(tucaoBtn);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-confirm-batch';
+    btn.innerHTML = '确定建单(<span class="total-n">0</span>单)';
+    btn.addEventListener('click', function () {
+      runBatchConfirmBuild(msgIndex);
+    });
+    el.appendChild(fb);
+    el.appendChild(btn);
+    return el;
+  }
+
+  var tucaoOverlay = document.getElementById('tucaoOverlay');
+  var tucaoText = document.getElementById('tucaoText');
+  var tucaoCountEl = document.getElementById('tucaoCount');
+  var TUCAO_DEMO_GROUP_ID = 'DEMO-GROUP-10001';
+  var TUCAO_DEMO_USER = '演示用户';
+  var TUCAO_DEMO_MOBILE = '13800138000';
+
+  function updateTucaoCount() {
+    if (!tucaoText || !tucaoCountEl) return;
+    tucaoCountEl.textContent = String(tucaoText.value.length);
+  }
+
+  function openTucaoModal(msgIndex) {
+    state.tucaoMsgIndex = msgIndex;
+    tucaoText.value = '';
+    updateTucaoCount();
+    tucaoOverlay.classList.add('show');
+    tucaoOverlay.setAttribute('aria-hidden', 'false');
+    setTimeout(function () { tucaoText.focus(); }, 0);
+  }
+
+  function closeTucaoModal() {
+    tucaoOverlay.classList.remove('show');
+    tucaoOverlay.setAttribute('aria-hidden', 'true');
+    state.tucaoMsgIndex = -1;
+  }
+
+  function submitTucao() {
+    var raw = tucaoText.value || '';
+    var text = raw.replace(/^\s+|\s+$/g, '');
+    if (!text.length) {
+      showToast('请输入吐槽内容');
+      return;
+    }
+    var payload = {
+      group_corp_id: TUCAO_DEMO_GROUP_ID,
+      user_name: TUCAO_DEMO_USER,
+      user_mobile: TUCAO_DEMO_MOBILE,
+      feedback_text: text,
+      recognition_msg_index: state.tucaoMsgIndex
+    };
+    console.log('[吐槽提交·演示落库]', payload);
+    showToast('已提交，感谢反馈');
+    closeTucaoModal();
+  }
+
+  function enterGridEdit(card, group, editBtn) {
+    if (group.buildLocked) return;
+    card.classList.add('editing');
+    editBtn.textContent = '完成';
+    var errKeys = {};
+    (group.failHighlightKeys || []).forEach(function (k) {
+      errKeys[k] = true;
+    });
+    card.querySelectorAll('.fg-cell').forEach(function (cell) {
+      var k = cell.getAttribute('data-field-key');
+      var valSpan = cell.querySelector('.fg-val');
+      if (!valSpan || cell.querySelector('.fg-inp')) return;
+      cell.classList.toggle('fg-err', !!errKeys[k]);
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.className = 'fg-inp';
+      inp.value = group.fields[k] || '';
+      cell.replaceChild(inp, valSpan);
+    });
+    var firstErr = card.querySelector('.fg-cell.fg-err .fg-inp');
+    var first = firstErr || card.querySelector('.fg-inp');
+    if (first) setTimeout(function () { first.focus(); }, 0);
+  }
+
+  function exitGridEdit(card, group) {
+    card.classList.remove('editing');
+    card.querySelectorAll('.fg-cell').forEach(function (cell) {
+      cell.classList.remove('fg-err');
+      var k = cell.getAttribute('data-field-key');
+      var inp = cell.querySelector('.fg-inp');
+      if (inp) {
+        group.fields[k] = inp.value;
+        var valSpan = document.createElement('span');
+        valSpan.className = 'fg-val';
+        valSpan.textContent = inp.value;
+        cell.replaceChild(valSpan, inp);
+      }
+    });
+    group.failEditHint = '';
+    group.failHighlightKeys = [];
+    if (group.fields) {
+      if (group.fields.plate != null) {
+        group.fields.plate_no = group.fields.plate;
+      }
+      if (group.fields.planDepart != null) {
+        group.fields.estimated_departure = group.fields.planDepart;
+      }
+    }
+    var editBtn = card.querySelector('.link-edit-inline');
+    if (editBtn) editBtn.textContent = '编辑 >';
+    renderMessages();
+    refreshFooterCounts();
+  }
+
+  function buildGroupCard(group, msgIndex, groupIndex, side) {
+    var card = document.createElement('div');
+    card.className = 'card-group group-block waybill-card';
+    card.id = side + '-g-' + msgIndex + '-' + group.index;
+
+    if (group.selected === undefined) group.selected = true;
+    if (!group.fields) group.fields = {};
+    if (!group.buildCount || group.buildCount < 1) group.buildCount = 1;
+
+    var head = document.createElement('div');
+    head.className = 'group-head';
+    if (group.detached && !group.buildLocked) {
+      card.classList.add('detached-inline');
+      var titleRowD = document.createElement('div');
+      titleRowD.className = 'build-locked-title';
+      titleRowD.appendChild(document.createTextNode(group.title));
+      var badgeD = document.createElement('span');
+      badgeD.style.fontSize = '11px';
+      badgeD.style.fontWeight = '600';
+      badgeD.style.color = '#D25F00';
+      badgeD.style.background = '#FFF7E8';
+      badgeD.style.padding = '2px 8px';
+      badgeD.style.borderRadius = '4px';
+      badgeD.textContent = '失败重提';
+      titleRowD.appendChild(badgeD);
+      head.appendChild(titleRowD);
+      var bcWrapD = document.createElement('span');
+      bcWrapD.className = 'build-count-box';
+      var inpBcD = document.createElement('input');
+      inpBcD.type = 'number';
+      inpBcD.min = '1';
+      inpBcD.value = String(group.buildCount);
+      function syncBcD() {
+        var n = parseInt(inpBcD.value, 10);
+        group.buildCount = isNaN(n) || n < 1 ? 1 : n;
+        inpBcD.value = String(group.buildCount);
+        renderMessages();
+        refreshFooterCounts();
+        document.querySelectorAll('.detached-retry-panel[data-detached-g="' + group.index + '"] .total-n-d').forEach(function (s) {
+          s.textContent = String(group.buildCount || 1);
+        });
+      }
+      inpBcD.addEventListener('change', syncBcD);
+      inpBcD.addEventListener('input', function () {
+        var n = parseInt(inpBcD.value, 10);
+        if (!isNaN(n) && n >= 1) {
+          group.buildCount = n;
+          document.querySelectorAll('.detached-retry-panel[data-detached-g="' + group.index + '"] .total-n-d').forEach(function (s) {
+            s.textContent = String(group.buildCount);
+          });
+        }
+      });
+      bcWrapD.appendChild(inpBcD);
+      bcWrapD.appendChild(document.createTextNode(' 单'));
+      head.appendChild(bcWrapD);
+    } else if (group.buildLocked) {
+      card.classList.add('build-locked');
+      var titleRow = document.createElement('div');
+      titleRow.className = 'build-locked-title';
+      titleRow.appendChild(document.createTextNode(group.title));
+      var badge = document.createElement('span');
+      badge.className = 'build-locked-badge';
+      badge.textContent = '已建单';
+      titleRow.appendChild(badge);
+      head.appendChild(titleRow);
+      var bcRo = document.createElement('span');
+      bcRo.className = 'build-locked-count';
+      bcRo.textContent = '已提交 ' + (group.buildCount || 1) + ' 单';
+      head.appendChild(bcRo);
+    } else {
+      var lab = document.createElement('label');
+      lab.className = 'chk';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!group.selected;
+      cb.addEventListener('change', function () {
+        group.selected = cb.checked;
+        renderMessages();
+        refreshFooterCounts();
+      });
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' ' + group.title));
+      head.appendChild(lab);
+
+      var bcWrap = document.createElement('span');
+      bcWrap.className = 'build-count-box';
+      var inpBc = document.createElement('input');
+      inpBc.type = 'number';
+      inpBc.min = '1';
+      inpBc.value = String(group.buildCount);
+      function syncBc() {
+        var n = parseInt(inpBc.value, 10);
+        group.buildCount = isNaN(n) || n < 1 ? 1 : n;
+        inpBc.value = String(group.buildCount);
+        renderMessages();
+        refreshFooterCounts();
+      }
+      inpBc.addEventListener('change', syncBc);
+      inpBc.addEventListener('input', function () {
+        var n = parseInt(inpBc.value, 10);
+        if (!isNaN(n) && n >= 1) {
+          group.buildCount = n;
+          refreshFooterCounts();
+        }
+      });
+      bcWrap.appendChild(inpBc);
+      bcWrap.appendChild(document.createTextNode(' 单'));
+      head.appendChild(bcWrap);
+    }
+
+    var meta = document.createElement('div');
+    meta.className = 'group-meta-line';
+    meta.textContent =
+      '装：' +
+      (group.loadAddr || '—') +
+      ' ｜ 卸：' +
+      (group.unloadAddr || '—') +
+      ' ｜ 车线：' +
+      (group.routeName || '—');
+
+    var grid = document.createElement('div');
+    grid.className = 'field-grid';
+    FIELD_GRID_DEF.forEach(function (pair) {
+      var key = pair[0];
+      var label = pair[1];
+      var cell = document.createElement('div');
+      cell.className = 'fg-cell';
+      cell.setAttribute('data-field-key', key);
+      var labEl = document.createElement('span');
+      labEl.className = 'fg-lab';
+      labEl.textContent = label;
+      var valEl = document.createElement('span');
+      valEl.className = 'fg-val';
+      valEl.textContent = group.fields[key] != null ? group.fields[key] : '';
+      cell.appendChild(labEl);
+      cell.appendChild(valEl);
+      grid.appendChild(cell);
+    });
+
+    if (group.plateNote) {
+      var pn = document.createElement('div');
+      pn.className = 'plate-note';
+      pn.style.margin = '0 12px 8px';
+      pn.textContent = group.plateNote;
+      card.appendChild(head);
+      card.appendChild(meta);
+      card.appendChild(pn);
+    } else {
+      card.appendChild(head);
+      card.appendChild(meta);
+    }
+    card.appendChild(grid);
+
+    if (group.warnVehicle) {
+      var wv = document.createElement('div');
+      wv.className = 'warn-strip';
+      wv.style.margin = '0 10px 10px';
+      wv.textContent =
+        '未查询到车辆。请补全车牌号等信息；补全后提交建单，系统将按现网规则处理，支持时可在运单创建过程中自动新增车辆档案。';
+      card.appendChild(wv);
+    }
+    if (group.warnDriver) {
+      var wd = document.createElement('div');
+      wd.className = 'warn-strip';
+      wd.style.margin = '0 10px 10px';
+      wd.textContent =
+        '未查询到司机。请补全司机姓名或电话等信息；补全后提交建单，系统将按现网规则处理，支持时可在运单创建过程中自动新增司机档案。';
+      card.appendChild(wd);
+    }
+    if (group.failEditHint) {
+      var fh = document.createElement('div');
+      fh.className = 'warn-strip';
+      fh.style.margin = '0 10px 10px';
+      fh.style.background = '#FFF2F0';
+      fh.style.borderColor = '#FFCCC7';
+      fh.style.color = '#D32029';
+      fh.textContent = group.failEditHint;
+      card.appendChild(fh);
+    }
+
+    if (!group.buildLocked) {
+      var foot = document.createElement('div');
+      foot.className = 'card-foot-link';
+      var editL = document.createElement('button');
+      editL.type = 'button';
+      editL.className = 'link-edit link-edit-inline';
+      editL.textContent = '编辑 >';
+      editL.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (group.buildLocked) return;
+        if (card.classList.contains('editing')) {
+          exitGridEdit(card, group);
+        } else {
+          enterGridEdit(card, group, editL);
+        }
+      });
+      foot.appendChild(editL);
+      card.appendChild(foot);
+    }
+
+    return card;
+  }
+
+  /** PC 线框已去掉左侧「运单组」重复卡片区；运单组仅在会话流 pcThread 中展示（与现网助手主区域一致）。 */
+  function renderSidebarCard() {}
+
+  /** 演示用：生成与旧版一致的成功/失败 outcomes（写入组状态） */
+  function finalizeDemoBatchOutcomes(recMsgIdx) {
+    var msg = state.messages[recMsgIdx];
+    var outcomes = [];
+    var base = 880000 + (Date.now() % 80000);
+    var seq = 0;
+    msg.groups.forEach(function (g) {
+      if (!g.selected || g.buildLocked) return;
+      var n = g.buildCount || 1;
+      var shouldFail = false;
+      var failReason = '';
+      var failKeys = [];
+      if (g.index === 2) {
+        g._buildAttempts = (g._buildAttempts || 0) + 1;
+        if (g._buildAttempts < 2) {
+          shouldFail = true;
+          failReason = '运单组2：接口返回「货物名称与地址校验未通过」';
+          failKeys = ['cargoName'];
+        }
+      } else if (g.index === 3) {
+        g._buildAttempts = (g._buildAttempts || 0) + 1;
+        if (g._buildAttempts < 2) {
+          shouldFail = true;
+          failReason = '运单组3：接口返回「运费必须为数字」';
+          failKeys = ['freight'];
+        }
+      }
+      if (shouldFail) {
+        g.failEditHint = failReason;
+        g.failHighlightKeys = failKeys;
+        outcomes.push({
+          type: 'fail',
+          recMsgIdx: recMsgIdx,
+          groupIndex: g.index,
+          reason:
+            g.index === 2
+              ? '接口返回「货物名称与地址校验未通过」'
+              : '接口返回「运费必须为数字」'
+        });
+      } else {
+        var nos = [];
+        for (var k = 0; k < n; k++) {
+          nos.push('WB20260413' + String(base + (seq++) * 19).slice(-6));
+        }
+        g.buildLocked = true;
+        g.selected = false;
+        g.detached = false;
+        g.detachAfterMsgIdx = undefined;
+        g.failEditHint = '';
+        g.failHighlightKeys = [];
+        outcomes.push({
+          type: 'success',
+          groupIndex: g.index,
+          nos: nos
+        });
+      }
+    });
+    return outcomes;
+  }
+
+  function runBatchConfirmBuild(msgIndex) {
+    var msg = state.messages[msgIndex];
+    if (!msg || !msg.groups) return;
+    if (allGroupsBuildLocked(msg)) {
+      showToast('本轮运单组均已建单成功');
+      return;
+    }
+    flushInlineEditsForMessage(msgIndex);
+    var total = getSubmitTotalForMessage(msgIndex);
+    if (total === 0) {
+      showToast('请勾选未建单成功的运单组');
+      return;
+    }
+    var sel = msg.groups.filter(function (g) {
+      return g.selected && !g.buildLocked;
+    });
+    var K = sel.length;
+    var P = sel.reduce(function (a, g) {
+      return a + (g.buildCount || 1);
+    }, 0);
+
+    var batchMsgIdx = state.messages.length;
+    state.messages.push({
+      role: 'bot',
+      buildBatch: {
+        recMsgIdx: msgIndex,
+        k: K,
+        p: P,
+        phase: 'running',
+        progress: { done: 0, total: P },
+        outcomes: null,
+        _animFrac: 0
+      }
+    });
+    renderMessages();
+
+    var startedAt = Date.now();
+    function tick() {
+      var cur = state.messages[batchMsgIdx];
+      if (!cur || !cur.buildBatch || cur.buildBatch.phase !== 'running') {
+        return;
+      }
+      var bb = cur.buildBatch;
+      var elapsed = Date.now() - startedAt;
+      var frac = Math.min(1, elapsed / 2000);
+      if (P <= 0) {
+        bb.progress.done = 0;
+        bb._animFrac = 0;
+      } else if (frac >= 1) {
+        bb.progress.done = P;
+        bb._animFrac = 1;
+      } else {
+        bb.progress.done = Math.min(P, Math.max(0, Math.ceil(frac * P)));
+        bb._animFrac = frac;
+      }
+      renderMessages();
+      if (elapsed < 2000) {
+        requestAnimationFrame(tick);
+      } else {
+        bb.progress.done = P;
+        bb.phase = 'done';
+        bb.outcomes = finalizeDemoBatchOutcomes(msgIndex);
+        renderMessages();
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /** 建单失败后「点击修改」：该组从原识别区迁出，贴在失败气泡下，仅勾选该组并进入编辑 */
+  function openInlineEditFromFail(recMsgIdx, groupIndex1, failMsgIdx) {
+    flushInlineEditsForMessage(recMsgIdx);
+    var msg = state.messages[recMsgIdx];
+    var g = findGroupInMessage(recMsgIdx, groupIndex1);
+    if (!g) {
+      showToast('未找到运单组');
+      return;
+    }
+    if (g.buildLocked) {
+      showToast('运单组已建单完成，不能再修改。');
+      return;
+    }
+    g.detached = true;
+    g.detachAfterMsgIdx = failMsgIdx;
+    if (msg && msg.groups) {
+      msg.groups.forEach(function (og) {
+        if (!og.buildLocked && og.index !== groupIndex1) og.selected = false;
+      });
+      g.selected = true;
+    }
+    renderMessages();
+    function activate(side) {
+      var card = document.getElementById(side + '-g-' + recMsgIdx + '-' + groupIndex1);
+      if (!card) return;
+      var editBtn = card.querySelector('.link-edit-inline');
+      if (!editBtn) return;
+      if (!card.classList.contains('editing')) {
+        enterGridEdit(card, g, editBtn);
+      } else {
+        var errInp = card.querySelector('.fg-cell.fg-err .fg-inp');
+        var anyInp = card.querySelector('.fg-inp');
+        (errInp || anyInp) && (errInp || anyInp).focus();
+      }
+    }
+    activate('p');
+    activate('m');
+    setTimeout(function () {
+      var panel = document.querySelector(
+        '.detached-retry-panel[data-detached-anchor="' + failMsgIdx + '"][data-detached-g="' + groupIndex1 + '"]'
+      );
+      if (panel) {
+        try {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {
+          panel.scrollIntoView();
+        }
+      }
+    }, 0);
+    refreshFooterCounts();
+    showToast('本组已移至失败提示下方，请在此修改并点「确定建单」');
+  }
+
+  function send() {
+    var rawText = mInput.value.trim();
+    if (!canSubmit()) {
+      showToast('请至少输入文字或选择附件');
+      pulse(mInput);
+      return;
+    }
+
+    state.recognizing = true;
+    refreshSubmitState();
+    showToast('识别中…（演示）');
+
+    var hits = findHitShortcuts(rawText);
+    var userText = formatUserPayload(rawText);
+
+    setTimeout(function () {
+      state.recognizing = false;
+      refreshSubmitState();
+
+      var demo = buildDemoResult(hits, rawText);
+
+      setInput('');
+      state.attachments.forEach(revokeAttachment);
+      state.attachments = [];
+      renderAttachments();
+
+      state.messages.push({ role: 'user', text: userText });
+      var cloned = demo.groups.map(function (g) {
+        return JSON.parse(JSON.stringify(g));
+      });
+      state.messages.push({ role: 'bot', text: demo.text, groups: cloned });
+      state.lastResultMsgIndex = state.messages.length - 1;
+      state.lastGroups = cloned;
+      state.hasGroup = true;
+      renderMessages();
+      renderSidebarCard();
+
+      var lastBot = mMessages.querySelector('.bubble.bot:last-of-type');
+      pulse(lastBot);
+      pulse(pcThread.querySelector('.bubble.bot:last-of-type'));
+    }, 900);
+  }
+
+  function clearAll() {
+    state.messages = [];
+    state.hasGroup = false;
+    state.lastGroups = [];
+    state.lastResultMsgIndex = -1;
+    state.recognizing = false;
+    state.attachments.forEach(revokeAttachment);
+    state.attachments = [];
+    setInput('');
+    renderAttachments();
+    renderMessages();
+    renderSidebarCard();
+    refreshSubmitState();
+    showToast('已清空会话与附件');
+  }
+
+  mInput.addEventListener('input', function () {
+    pcInput.value = mInput.value;
+    refreshSubmitState();
+  });
+  pcInput.addEventListener('input', function () {
+    mInput.value = pcInput.value;
+    refreshSubmitState();
+  });
+
+  mCam.addEventListener('click', function () {
+    if (state.recognizing) return;
+    mFile.click();
+  });
+  mFile.addEventListener('change', function () {
+    if (mFile.files && mFile.files.length) addFilesFromInput(mFile.files);
+    mFile.value = '';
+  });
+  pcFileBtn.addEventListener('click', function () {
+    if (state.recognizing) return;
+    pcFile.click();
+  });
+  pcFile.addEventListener('change', function () {
+    if (pcFile.files && pcFile.files.length) addFilesFromInput(pcFile.files);
+    pcFile.value = '';
+  });
+
+  mSend.addEventListener('click', send);
+  pcSend.addEventListener('click', send);
+  document.getElementById('mClear').addEventListener('click', clearAll);
+  document.getElementById('pcClear').addEventListener('click', clearAll);
+
+  document.getElementById('loadPrdCase').addEventListener('click', function () {
+    setInput(PRD_MULTI_DEMO_TEXT);
+    showToast('已载入 §2.2 多单案例，可直接发送识别');
+  });
+
+  function buildWaybillSelectHtml(selected) {
+    var list = WAYBILL_TEMPLATE_FIELDS.slice();
+    if (selected && list.indexOf(selected) === -1) list.unshift(selected);
+    return list
+      .map(function (f) {
+        var esc = escapeHtml(f);
+        return (
+          '<option value="' +
+          esc +
+          '"' +
+          (f === selected ? ' selected' : '') +
+          '>' +
+          esc +
+          '</option>'
+        );
+      })
+      .join('');
+  }
+
+  function renderMappingUnified() {
+    if (!mapUnifiedRowsEl) return;
+    var rules = state.mappingRules;
+    if (mapRuleCountEl) mapRuleCountEl.textContent = String(rules.length);
+    if (mapPageHintEl) {
+      mapPageHintEl.textContent = '共 ' + rules.length + ' 条，每页 20 条';
+    }
+
+    mapUnifiedRowsEl.innerHTML = '';
+    rules.forEach(function (rule) {
+      var tr = document.createElement('tr');
+
+      var td1 = document.createElement('td');
+      td1.className = 'col-aliases';
+      var inner = document.createElement('div');
+      inner.className = 'map-alias-cell-inner';
+
+      rule.aliases.forEach(function (alias) {
+        var tag = document.createElement('span');
+        tag.className = 'map-alias-tag';
+        tag.appendChild(document.createTextNode(alias));
+        var xb = document.createElement('button');
+        xb.type = 'button';
+        xb.className = 'map-alias-x';
+        xb.setAttribute('aria-label', '删除「' + alias + '」');
+        xb.textContent = '×';
+        xb.addEventListener('click', function (e) {
+          e.stopPropagation();
+          rule.aliases = rule.aliases.filter(function (a) {
+            return a !== alias;
+          });
+          renderMappingUnified();
+        });
+        tag.appendChild(xb);
+        inner.appendChild(tag);
+      });
+
+      if (mapAliasInputRowId === rule.id) {
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.className = 'map-alias-input';
+        inp.placeholder = '输入后回车添加';
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            var v = (inp.value || '').replace(/^\s+|\s+$/g, '');
+            if (v && rule.aliases.indexOf(v) === -1) rule.aliases.push(v);
+            inp.value = '';
+            mapAliasInputRowId = null;
+            renderMappingUnified();
+          } else if (e.key === 'Escape') {
+            mapAliasInputRowId = null;
+            renderMappingUnified();
+          }
+        });
+        inner.appendChild(inp);
+        setTimeout(function () {
+          inp.focus();
+        }, 0);
+      }
+
+      var addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'map-alias-add';
+      addBtn.textContent = '+';
+      addBtn.title = '添加识别字段别名';
+      addBtn.addEventListener('click', function () {
+        mapAliasInputRowId = rule.id;
+        renderMappingUnified();
+      });
+      inner.appendChild(addBtn);
+
+      td1.appendChild(inner);
+      tr.appendChild(td1);
+
+      var td2 = document.createElement('td');
+      var sel = document.createElement('select');
+      sel.className = 'map-sys-select';
+      sel.innerHTML = buildWaybillSelectHtml(rule.systemField);
+      sel.addEventListener('change', function () {
+        rule.systemField = sel.value;
+      });
+      td2.appendChild(sel);
+      tr.appendChild(td2);
+
+      var td3 = document.createElement('td');
+      td3.className = 'usage-cell';
+      td3.textContent = (rule.usage != null ? rule.usage : 0) + ' 次';
+      tr.appendChild(td3);
+
+      var td4 = document.createElement('td');
+      td4.textContent = rule.lastUsed != null ? rule.lastUsed : '—';
+      tr.appendChild(td4);
+
+      var td5 = document.createElement('td');
+      td5.className = 'col-del';
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'map-del';
+      del.textContent = '删除';
+      del.addEventListener('click', function () {
+        pendingMapRuleDeleteId = rule.id;
+        modalMapRuleDel.classList.add('show');
+      });
+      td5.appendChild(del);
+      tr.appendChild(td5);
+
+      mapUnifiedRowsEl.appendChild(tr);
+    });
+  }
+
+  function closeMapRuleDeleteConfirm() {
+    if (modalMapRuleDel) modalMapRuleDel.classList.remove('show');
+    pendingMapRuleDeleteId = null;
+  }
+
+  function openModal() {
+    renderShortcutEditor();
+    mapAliasInputRowId = null;
+    renderMappingUnified();
+    modal.classList.add('show');
+  }
+  function closeModal() {
+    modal.classList.remove('show');
+    closeMapRuleDeleteConfirm();
+  }
+
+  function renderShortcutEditor() {
+    shortcutRows.innerHTML = '';
+    state.shortcuts.forEach(function (row, idx) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="col-op"><button type="button" class="btn-del" data-i="' + idx + '">删除</button></td>' +
+        '<td>' + (idx + 1) + '</td>' +
+        '<td><input type="text" class="inp-s" data-i="' + idx + '" data-f="shortcut" value="' + escapeHtml(row.shortcut) + '"></td>' +
+        '<td><textarea class="inp-e" data-i="' + idx + '" data-f="expansion">' + escapeHtml(row.expansion) + '</textarea></td>';
+      shortcutRows.appendChild(tr);
+    });
+    shortcutRows.querySelectorAll('.btn-del').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.getAttribute('data-i'), 10);
+        state.shortcuts.splice(i, 1);
+        renderShortcutEditor();
+      });
+    });
+  }
+
+  function switchRecognitionTab(panelId) {
+    document.querySelectorAll('#modalRecognitionConfig .mapping-tab-bar .map-tab').forEach(function (t) {
+      var pid = t.getAttribute('data-panel');
+      t.classList.toggle('active', pid === panelId);
+    });
+    document.querySelectorAll('#modalRecognitionConfig .mapping-body-pad > .map-panel').forEach(function (p) {
+      p.classList.toggle('active', p.id === panelId);
+    });
+    if (panelId === 'recPanelMapping') {
+      mapAliasInputRowId = null;
+      renderMappingUnified();
+    }
+  }
+  document.getElementById('btnRecognitionConfig').addEventListener('click', function () {
+    openModal();
+    switchRecognitionTab('recPanelShortcut');
+  });
+  document.getElementById('recConfigCloseX').addEventListener('click', closeModal);
+  document.getElementById('shortcutCancel').addEventListener('click', closeModal);
+  document.querySelectorAll('#modalRecognitionConfig .mapping-tab-bar .map-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      switchRecognitionTab(tab.getAttribute('data-panel'));
+    });
+  });
+  document.getElementById('shortcutOk').addEventListener('click', function () {
+    var rows = shortcutRows.querySelectorAll('tr');
+    var next = [];
+    rows.forEach(function (tr) {
+      var s = tr.querySelector('.inp-s');
+      var e = tr.querySelector('.inp-e');
+      if (!s || !e) return;
+      var sc = (s.value || '').trim();
+      var ex = (e.value || '').trim();
+      if (sc || ex) next.push({ shortcut: sc, expansion: ex });
+    });
+    state.shortcuts = next.length ? next : [{ shortcut: '', expansion: '' }];
+    closeModal();
+    showToast('识别配置已保存（演示·简称表；映射规则在实网写入）');
+  });
+  document.getElementById('shortcutAdd').addEventListener('click', function () {
+    state.shortcuts.push({ shortcut: '', expansion: '' });
+    renderShortcutEditor();
+  });
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) closeModal();
+  });
+
+  document.getElementById('mapRuleDelCancel').addEventListener('click', closeMapRuleDeleteConfirm);
+  document.getElementById('mapRuleDelOk').addEventListener('click', function () {
+    if (!pendingMapRuleDeleteId) {
+      closeMapRuleDeleteConfirm();
+      return;
+    }
+    state.mappingRules = state.mappingRules.filter(function (r) {
+      return r.id !== pendingMapRuleDeleteId;
+    });
+    closeMapRuleDeleteConfirm();
+    renderMappingUnified();
+    showToast('已删除该条映射关系（演示）');
+  });
+  modalMapRuleDel.addEventListener('click', function (e) {
+    if (e.target === modalMapRuleDel) closeMapRuleDeleteConfirm();
+  });
+
+  document.getElementById('mapAddRuleRow').addEventListener('click', function () {
+    var nr = {
+      id: nextMapRuleId(),
+      aliases: [],
+      systemField: WAYBILL_TEMPLATE_FIELDS[0],
+      usage: 0,
+      lastUsed: '—'
+    };
+    state.mappingRules.push(nr);
+    mapAliasInputRowId = nr.id;
+    renderMappingUnified();
+  });
+
+  function onThreadFailModifyClick(e) {
+    var t = e.target.closest('.link-fail-mod');
+    if (!t) return;
+    var rec = parseInt(t.getAttribute('data-rec-msg'), 10);
+    var gix = parseInt(t.getAttribute('data-g-idx'), 10);
+    var fidx = parseInt(t.getAttribute('data-fail-msg-idx'), 10);
+    if (isNaN(fidx)) fidx = -1;
+    openInlineEditFromFail(rec, gix, fidx);
+  }
+  mMessages.addEventListener('click', onThreadFailModifyClick);
+  pcThread.addEventListener('click', onThreadFailModifyClick);
+
+  tucaoText.addEventListener('input', updateTucaoCount);
+  document.getElementById('tucaoClose').addEventListener('click', closeTucaoModal);
+  document.getElementById('tucaoCancel').addEventListener('click', closeTucaoModal);
+  document.getElementById('tucaoSubmit').addEventListener('click', submitTucao);
+  tucaoOverlay.addEventListener('click', function (e) {
+    if (e.target === tucaoOverlay) closeTucaoModal();
+  });
+
+  renderAttachments();
+  renderMessages();
+  renderSidebarCard();
+  refreshSubmitState();
+})();
+</script>
+</body>
+</html>

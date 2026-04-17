@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮胎回收 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    a{color:#165DFF;}
+    .layout-topnav{position:fixed;top:0;left:0;right:0;height:48px;background:#2B2B6E;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;}
+    .tn-left{display:flex;align-items:center;gap:8px;color:#fff;font-weight:600;}
+    .tn-g{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+    .tn-tabs{display:flex;margin-left:12px;}
+    .tn-tab{color:rgba(255,255,255,.72);padding:0 16px;height:48px;display:flex;align-items:center;border-bottom:2px solid transparent;font-size:14px;}
+    .tn-tab.act{color:#fff;background:rgba(255,255,255,.1);border-bottom-color:#fff;}
+    .tn-r{display:flex;align-items:center;gap:10px;}
+    .tn-s{width:200px;height:30px;border:none;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;padding:0 12px;font-size:13px;}
+    .tn-s::placeholder{color:rgba(255,255,255,.55);}
+    .layout-sider{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;z-index:90;overflow-y:auto;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:13px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;border-radius:0 4px 4px 0;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+    .sd-ms{padding:8px 12px;}
+    .sd-ms input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+    .sd-u{padding:14px 12px;display:flex;gap:10px;border-bottom:1px solid #F2F3F5;font-size:13px;}
+    .sd-a{width:36px;height:36px;border-radius:50%;background:#86909C;}
+    .sd-n{font-weight:600;color:#1D2129;}
+    .sd-o{font-size:12px;color:#86909C;}
+    .layout-main{margin-left:200px;margin-top:48px;padding:16px 20px;max-width:1100px;}
+    .bc{font-size:13px;color:#86909C;margin-bottom:12px;}
+    .panel{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:20px;}
+    .tit{font-size:18px;font-weight:600;color:#1D2129;margin-bottom:8px;}
+    .sub{font-size:13px;color:#86909C;margin-bottom:16px;}
+    .alert-r{background:#FFF1F0;border:1px solid #FFCCC7;color:#CF1322;font-size:12px;padding:10px 12px;border-radius:4px;margin-bottom:16px;}
+    .sec-h{font-size:14px;font-weight:600;color:#1D2129;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #F2F3F5;}
+    table.tb{width:100%;border-collapse:collapse;font-size:13px;}
+    table.tb th,table.tb td{border:1px solid #E5E6EB;padding:10px;text-align:left;}
+    table.tb th{background:#F7F8FA;color:#1D2129;font-weight:600;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-top:16px;}
+    .fld label{display:block;font-size:13px;margin-bottom:6px;}
+    .req{color:#F53F3F;}
+    .fld input,.fld select,.fld textarea{width:100%;border:1px solid #E5E6EB;border-radius:4px;padding:8px 10px;font-size:13px;}
+    .fld textarea{min-height:72px;resize:vertical;}
+    .fld.full{grid-column:1/-1;}
+    .snap{background:#FAFBFC;border:1px solid #E5E6EB;border-radius:4px;padding:12px;margin-top:12px;font-size:12px;}
+    .snap strong{color:#1D2129;}
+    .act{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #E5E6EB;}
+    .btn{height:34px;padding:0 16px;border-radius:4px;border:1px solid #E5E6EB;background:#fff;font-size:13px;cursor:pointer;}
+    .btn-p{background:#165DFF;color:#fff;border-color:#165DFF;}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;}
+    .modal.show{display:flex;}
+    .md-box{background:#fff;border-radius:8px;width:min(520px,100%);padding:20px;}
+    .md-box h4{margin-bottom:10px;}
+  </style>
+</head>
+<body>
+  <header class="layout-topnav">
+    <div class="tn-left"><span class="tn-g">G</span> 财运通<nav class="tn-tabs"><span class="tn-tab act">轮胎回收</span></nav></div>
+    <div class="tn-r"><input class="tn-s" placeholder="让查询更简单"></div>
+  </header>
+  <aside class="layout-sider">
+    <div class="sd-u"><div class="sd-a"></div><div><div class="sd-n">超级管理员</div><div class="sd-o">智能管车集团</div></div></div>
+    <a class="sd-back" href="1-轮胎卡片列表.html">← 返回轮胎卡片列表</a>
+    <div class="sd-ms"><input placeholder="搜索菜单"></div>
+    <nav class="sd-tire-tree">
+      <div class="sd-tree-h">轮胎管理</div>
+      <a class="sd-tree-item" href="1-轮胎卡片列表.html">轮胎卡片</a>
+      <a class="sd-tree-item" href="2-轮胎入库.html">轮胎入库</a>
+      <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+      <a class="sd-tree-item active" href="5-轮胎回收.html">轮胎回收</a>
+      <a class="sd-tree-item" href="6-轮胎售卖.html">轮胎售卖</a>
+      <a class="sd-tree-item" href="7-创建报销单.html">创建报销单</a>
+      <a class="sd-tree-item" href="4-轮胎详情.html">轮胎详情</a>
+      <a class="sd-tree-item" href="8-统计分析.html">数据分析</a>
+    </nav>
+  </aside>
+  <main class="layout-main">
+    <div class="bc"><a href="1-轮胎卡片列表.html">轮胎卡片</a> / 轮胎回收</div>
+    <div class="panel">
+      <h1 class="tit">轮胎回收</h1>
+      <p class="sub">PRD §5.3：仅「已领用」状态可回收；须填写回收原因；回收后状态 →「已回收」，清空车辆/安装位置；支持批量回收（单次≤200条）。</p>
+      <div class="alert-r">演示：以下为列表勾选带入的待回收轮胎（实际实现以勾选行为准）。</div>
+      <div class="sec-h">待回收轮胎（已领用）</div>
+      <table class="tb">
+        <thead>
+          <tr><th width="40"><input type="checkbox" checked title="全选"></th><th>轮胎编号</th><th>品牌</th><th>当前车辆</th><th>安装位置</th><th>司机快照</th><th>领用人</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" checked></td>
+            <td>TL-2026-002</td>
+            <td>米其林</td>
+            <td>京A12345</td>
+            <td>前左</td>
+            <td>王强 138****8000</td>
+            <td>李四</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td>TL-2026-088</td>
+            <td>固特异</td>
+            <td>京B67890</td>
+            <td>后左1</td>
+            <td>赵刚 139****1200</td>
+            <td>赵六</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="snap">
+        <strong>车辆/司机快照说明：</strong>回收事件落库时写入拆胎当时的车牌、司机、手机号（与列表/详情快照字段一致），用于追溯。
+      </div>
+      <div class="grid2">
+        <div class="fld full">
+          <label><span class="req">*</span> 回收原因</label>
+          <textarea id="reReason" placeholder="如：花纹磨损更换、事故拆胎等"></textarea>
+        </div>
+        <div class="fld">
+          <label><span class="req">*</span> 回收操作时间</label>
+          <input type="datetime-local" id="reTime" value="2026-03-31T16:30">
+        </div>
+        <div class="fld">
+          <label>操作人</label>
+          <input value="超级管理员" readonly style="background:#F7F8FA;">
+        </div>
+      </div>
+      <div class="fld full" style="margin-top:14px;">
+        <label><input type="checkbox" id="reAfter"> 回收成功后打开「轮胎领用」（一键替换，PRD 场景）</label>
+      </div>
+      <div class="act">
+        <a class="btn" href="1-轮胎卡片列表.html">返回</a>
+        <button type="button" class="btn" onclick="document.getElementById('batchDlg').classList.add('show')">演示：批量回收进度</button>
+        <button type="button" class="btn btn-p" onclick="doRecycle()">确认回收</button>
+      </div>
+    </div>
+  </main>
+  <div class="modal" id="batchDlg" role="dialog">
+    <div class="md-box">
+      <h4>批量回收进度</h4>
+      <p style="font-size:13px;color:#CF1322;margin-bottom:12px;">批量处理中请勿关闭（3/10）…</p>
+      <table class="tb"><thead><tr><th>编号</th><th>状态</th></tr></thead><tbody><tr><td>TL-2026-100</td><td style="color:#00B42A;">成功</td></tr></tbody></table>
+      <div style="text-align:right;margin-top:14px;"><button type="button" class="btn" onclick="document.getElementById('batchDlg').classList.remove('show')">关闭</button></div>
+    </div>
+  </div>
+  <script>
+  function doRecycle(){
+    var r=document.getElementById('reReason').value.trim();
+    if(!r){alert('请填写回收原因');return;}
+    var msg='演示：回收成功。\n· 轮胎状态 → 已回收\n· 已写入 tire_event（回收）及车辆/司机快照\n'+(document.getElementById('reAfter').checked?'· 即将跳转领用页':'');
+    alert(msg);
+    if(document.getElementById('reAfter').checked) location.href='3-轮胎领用.html';
+    else location.href='1-轮胎卡片列表.html';
+  }
+  document.getElementById('batchDlg').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+  </script>
+</body>
+</html>

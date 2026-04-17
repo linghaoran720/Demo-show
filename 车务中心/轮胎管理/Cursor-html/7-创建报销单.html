@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创建报销单 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    a{color:#165DFF;}
+    .top{position:fixed;inset:0 0 auto 0;height:48px;background:#2B2B6E;display:flex;align-items:center;padding:0 16px;color:#fff;font-weight:600;z-index:100;}
+    .side{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;overflow-y:auto;}
+    .side-p{padding:14px;font-size:13px;border-bottom:1px solid #F2F3F5;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-ms{padding:8px 12px;}
+    .sd-ms input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:12px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+    .main{margin-left:200px;margin-top:48px;padding:16px 20px;max-width:1100px;}
+    .bc{font-size:13px;color:#86909C;margin-bottom:12px;}
+    .panel{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:20px;}
+    .tit{font-size:18px;font-weight:600;color:#1D2129;}
+    .tip{font-size:13px;color:#86909C;margin:8px 0 14px;}
+    .info{background:#FFF7E8;border:1px solid #FFCF8B;color:#D25F00;font-size:12px;padding:10px 12px;border-radius:4px;margin-bottom:14px;}
+    .sec{font-size:14px;font-weight:600;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid #F2F3F5;}
+    table.tb{width:100%;border-collapse:collapse;font-size:13px;}
+    table.tb th,table.tb td{border:1px solid #E5E6EB;padding:8px 10px;text-align:left;}
+    table.tb th{background:#F7F8FA;}
+    table.tb td.num{text-align:right;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;max-width:640px;margin-top:12px;}
+    .fld label{display:block;font-size:13px;margin-bottom:6px;}
+    .req{color:#F53F3F;}
+    .fld input,.fld textarea{width:100%;border:1px solid #E5E6EB;border-radius:4px;padding:8px 10px;font-size:13px;}
+    .fld textarea{min-height:56px;resize:vertical;}
+    .act{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #E5E6EB;}
+    .btn{height:34px;padding:0 16px;border-radius:4px;border:1px solid #E5E6EB;background:#fff;cursor:pointer;font-size:13px;}
+    .btn-p{background:#165DFF;color:#fff;border-color:#165DFF;}
+    .sum{font-size:14px;color:#1D2129;margin-top:10px;}
+  </style>
+</head>
+<body>
+  <div class="top"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:#fff;color:#2B2B6E;border-radius:4px;margin-right:8px;font-weight:700;">G</span> 财运通 · 创建报销单</div>
+  <aside class="side">
+    <div class="side-p"><strong>超级管理员</strong><br><span style="color:#86909C;font-size:12px;">智能管车集团</span></div>
+    <a class="sd-back" href="1-轮胎卡片列表.html">← 返回轮胎卡片列表</a>
+    <div class="sd-ms"><input placeholder="搜索菜单"></div>
+    <nav class="sd-tire-tree">
+      <div class="sd-tree-h">轮胎管理</div>
+      <a class="sd-tree-item" href="1-轮胎卡片列表.html">轮胎卡片</a>
+      <a class="sd-tree-item" href="2-轮胎入库.html">轮胎入库</a>
+      <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+      <a class="sd-tree-item" href="5-轮胎回收.html">轮胎回收</a>
+      <a class="sd-tree-item" href="6-轮胎售卖.html">轮胎售卖</a>
+      <a class="sd-tree-item active" href="7-创建报销单.html">创建报销单</a>
+      <a class="sd-tree-item" href="4-轮胎详情.html">轮胎详情</a>
+      <a class="sd-tree-item" href="8-统计分析.html">数据分析</a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="bc"><a href="1-轮胎卡片列表.html">轮胎卡片</a> / 创建报销单</div>
+    <div class="panel">
+      <h1 class="tit">创建报销单</h1>
+      <p class="tip">PRD §5.7：可跨入库单勾选轮胎；报销总金额必填且 ≤ 选中轮胎采购价合计；按采购价比例分摊至每条轮胎（四舍五入保留两位，余数归入分摊最大的一条）。</p>
+      <div class="info">示例与 PRD 一致：A 采购 100 元 + B 采购 50 元；报销总金额 30 元 → A 分摊 20.00，B 分摊 10.00。</div>
+      <div class="sec">已选轮胎（演示数据，来自列表勾选）</div>
+      <table class="tb" id="srcTable">
+        <thead><tr><th>轮胎编号</th><th>入库单号</th><th>采购价(元)</th></tr></thead>
+        <tbody>
+          <tr data-price="100"><td>模拟-A</td><td>总部仓库260330010</td><td class="num">100.00</td></tr>
+          <tr data-price="50"><td>模拟-B</td><td>总部仓库260330010</td><td class="num">50.00</td></tr>
+        </tbody>
+      </table>
+      <p class="sum">采购价合计：<strong id="sumPurchase">150.00</strong> 元</p>
+      <div class="sec">报销信息</div>
+      <div class="grid">
+        <div class="fld">
+          <label><span class="req">*</span> 报销总金额(元)</label>
+          <input type="number" id="rbTotal" value="30" step="0.01" min="0.01">
+        </div>
+        <div class="fld">
+          <label><span class="req">*</span> 报销说明</label>
+          <input id="rbNote" placeholder="如：3 月轮胎采购集中报销">
+        </div>
+        <div class="fld" style="grid-column:1/-1;">
+          <label>备注（选填）</label>
+          <textarea placeholder="财务可见备注"></textarea>
+        </div>
+      </div>
+      <button type="button" class="btn" style="margin-top:12px;" onclick="recalcShare()">重新计算分摊</button>
+      <div class="sec">分摊预览</div>
+      <table class="tb">
+        <thead><tr><th>轮胎编号</th><th>采购价</th><th>分摊比例</th><th>本次分摊金额(元)</th></tr></thead>
+        <tbody id="shareBody"></tbody>
+      </table>
+      <p id="shareCheck" style="font-size:12px;color:#86909C;margin-top:8px;"></p>
+      <div class="act">
+        <a class="btn" href="1-轮胎卡片列表.html">取消</a>
+        <button type="button" class="btn btn-p" onclick="createBX()">确认创建报销单</button>
+      </div>
+    </div>
+  </main>
+  <script>
+  function sumPrices(){
+    var rows=document.querySelectorAll('#srcTable tbody tr');
+    var s=0;
+    rows.forEach(function(tr){s+=parseFloat(tr.getAttribute('data-price'))||0;});
+    return s;
+  }
+  function recalcShare(){
+    var total=parseFloat(document.getElementById('rbTotal').value);
+    var sumP=sumPrices();
+    document.getElementById('sumPurchase').textContent=sumP.toFixed(2);
+    var body=document.getElementById('shareBody');
+    body.innerHTML='';
+    if(isNaN(total)||total<=0){document.getElementById('shareCheck').textContent='请输入有效的报销总金额';return;}
+    if(total>sumP+1e-6){document.getElementById('shareCheck').textContent='报销总金额不能超过采购价合计 '+sumP.toFixed(2)+' 元';return;}
+    var rows=[].slice.call(document.querySelectorAll('#srcTable tbody tr'));
+    var parts=rows.map(function(tr){
+      var p=parseFloat(tr.getAttribute('data-price'))||0;
+      var raw=sumP>0?total*(p/sumP):0;
+      return {tr:tr,price:p,raw:raw};
+    });
+    var alloc=parts.map(function(x,i){
+      var v=Math.round(x.raw*100)/100;
+      return {i:i,tr:x.tr,price:x.price,alloc:v};
+    });
+    var allocated=alloc.reduce(function(a,b){return a+b.alloc;},0);
+    var diff=Math.round((total-allocated)*100)/100;
+    if(alloc.length&&Math.abs(diff)>1e-9){
+      var maxI=0;
+      alloc.forEach(function(x,idx){if(x.alloc>alloc[maxI].alloc)maxI=idx;});
+      alloc[maxI].alloc=Math.round((alloc[maxI].alloc+diff)*100)/100;
+    }
+    alloc.forEach(function(x){
+      var tr=x.tr;
+      var no=tr.cells[0].textContent;
+      var ratio=sumP>0?(x.price/sumP*100).toFixed(2)+'%':'—';
+      var row=document.createElement('tr');
+      row.innerHTML='<td>'+no+'</td><td class="num">'+x.price.toFixed(2)+'</td><td>'+ratio+'</td><td class="num">'+x.alloc.toFixed(2)+'</td>';
+      body.appendChild(row);
+    });
+    var chk=alloc.reduce(function(a,b){return a+b.alloc;},0);
+    document.getElementById('shareCheck').textContent='分摊合计 '+chk.toFixed(2)+' 元（应与报销总金额一致）'+ (Math.abs(chk-total)<0.02?' ✓':'');
+  }
+  function createBX(){
+    var t=parseFloat(document.getElementById('rbTotal').value);
+    var sumP=sumPrices();
+    if(isNaN(t)||t<=0){alert('请填写报销总金额');return;}
+    if(t>sumP+1e-6){alert('报销总金额不能超过采购价合计');return;}
+    if(!document.getElementById('rbNote').value.trim()){alert('请填写报销说明');return;}
+    recalcShare();
+    alert('演示：财务报销单已生成 BX202603310066\n各轮胎报销状态更新为「部分报销」或「已报销」（依分摊是否顶满采购价）');
+    location.href='1-轮胎卡片列表.html';
+  }
+  recalcShare();
+  document.getElementById('rbTotal').addEventListener('input',recalcShare);
+  </script>
+</body>
+</html>

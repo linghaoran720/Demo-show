@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮胎售卖 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    a{color:#165DFF;}
+    .layout-topnav{position:fixed;top:0;left:0;right:0;height:48px;background:#2B2B6E;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;}
+    .tn-l{display:flex;align-items:center;gap:8px;color:#fff;font-weight:600;}
+    .tn-g{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+    .main{margin-left:200px;margin-top:48px;padding:16px 20px;max-width:1000px;}
+    .bc{color:#86909C;font-size:13px;margin-bottom:12px;}
+    .panel{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:20px;}
+    .tit{font-size:18px;font-weight:600;color:#1D2129;}
+    .sub{font-size:13px;color:#86909C;margin:8px 0 16px;}
+    .err{background:#FFF1F0;border:1px solid #FFCCC7;color:#CF1322;font-size:12px;padding:10px 12px;border-radius:4px;margin-bottom:14px;}
+    .info{background:#E8F3FF;border:1px solid #BEDAFF;color:#165DFF;font-size:12px;padding:10px 12px;border-radius:4px;margin-bottom:14px;}
+    .sec-h{font-size:14px;font-weight:600;color:#1D2129;margin:16px 0 10px;padding-bottom:8px;border-bottom:1px solid #F2F3F5;}
+    table.tb{width:100%;border-collapse:collapse;font-size:13px;}
+    table.tb th,table.tb td{border:1px solid #E5E6EB;padding:10px;text-align:left;}
+    table.tb th{background:#F7F8FA;}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 18px;}
+    .fld label{display:block;font-size:13px;margin-bottom:6px;}
+    .req{color:#F53F3F;}
+    .fld input{width:100%;height:32px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:13px;}
+    .fld.full{grid-column:1/-1;}
+    .fld textarea{width:100%;min-height:64px;border:1px solid #E5E6EB;border-radius:4px;padding:8px 10px;font-size: 13px;resize:vertical;}
+    .act{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #E5E6EB;}
+    .btn{height:34px;padding:0 16px;border-radius:4px;border:1px solid #E5E6EB;background:#fff;font-size:13px;cursor:pointer;}
+    .btn-p{background:#165DFF;color:#fff;border-color:#165DFF;}
+    .hide-diff{display:none;}
+    .hide-diff.show{display:block;}
+    .upload-wrap{margin-top:8px;}
+    .upload-hint{font-size:12px;color:#86909C;margin-bottom:8px;}
+    .upload-zone{border:1px dashed #C9CDD4;border-radius:4px;padding:20px;text-align:center;background:#FAFBFC;cursor:pointer;transition:border-color .15s,background .15s;}
+    .upload-zone:hover,.upload-zone.drag{border-color:#165DFF;background:#F0F5FF;}
+    .upload-zone p{font-size:13px;color:#4E5969;margin-bottom:4px;}
+    .upload-zone .up-sub{font-size:12px;color:#86909C;}
+    .upload-zone input[type=file]{display:none;}
+    .att-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;}
+    .att-item{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#F7F8FA;border:1px solid #E5E6EB;border-radius:4px;font-size:12px;max-width:100%;}
+    .att-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;}
+    .att-item .rm{color:#F53F3F;cursor:pointer;padding:0 4px;font-weight:700;line-height:1;}
+    .att-count{font-size:12px;color:#86909C;margin-top:8px;}
+    .att-count.warn{color:#D25F00;}
+    .layout-sider{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;z-index:90;overflow-y:auto;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:12px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+    .sd-top{padding:14px 12px;border-bottom:1px solid #F2F3F5;font-size:13px;}
+    .sd-ms{padding:8px 12px;}
+    .sd-ms input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+  </style>
+</head>
+<body>
+  <header class="layout-topnav">
+    <div class="tn-l"><span class="tn-g">G</span> 财运通</div>
+    <input placeholder="让查询更简单" style="width:200px;height:30px;border:none;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;padding:0 12px;">
+  </header>
+  <aside class="layout-sider">
+    <div class="sd-top"><strong>超级管理员</strong><br><span style="color:#86909C;font-size:12px;">智能管车集团</span></div>
+    <a class="sd-back" href="1-轮胎卡片列表.html">← 返回轮胎卡片列表</a>
+    <div class="sd-ms"><input placeholder="搜索菜单"></div>
+    <nav class="sd-tire-tree">
+      <div class="sd-tree-h">轮胎管理</div>
+      <a class="sd-tree-item" href="1-轮胎卡片列表.html">轮胎卡片</a>
+      <a class="sd-tree-item" href="2-轮胎入库.html">轮胎入库</a>
+      <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+      <a class="sd-tree-item" href="5-轮胎回收.html">轮胎回收</a>
+      <a class="sd-tree-item active" href="6-轮胎售卖.html">轮胎售卖</a>
+      <a class="sd-tree-item" href="7-创建报销单.html">创建报销单</a>
+      <a class="sd-tree-item" href="4-轮胎详情.html">轮胎详情</a>
+      <a class="sd-tree-item" href="8-统计分析.html">数据分析</a>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="bc"><a href="1-轮胎卡片列表.html">轮胎卡片</a> / 轮胎售卖</div>
+    <div class="panel">
+      <h1 class="tit">轮胎售卖</h1>
+      <p class="sub">PRD §5.5：仅「入库」「已回收」「已作废」可售卖；确认后状态→「售卖待确认」；<strong>系统自动创建财务收据</strong>并提交审批；售价 &lt; 采购价须填价格差异原因。</p>
+      <div class="info">收据编号由财务规则生成（演示：SJ + 日期 + 流水）。审批通过 →「已卖出」；拒绝 → 状态回退并删除收据关联。</div>
+      <div class="err">以下为列表勾选带入的待售卖轮胎（不可包含「已领用」）。</div>
+      <div class="sec-h">售卖明细</div>
+      <table class="tb">
+        <thead><tr><th>轮胎编号</th><th>状态</th><th>采购价(元)</th><th>入库单号</th></tr></thead>
+        <tbody id="sellRows">
+          <tr data-price="1100"><td>TL-2026-015</td><td>已回收</td><td>1,100.00</td><td>总部仓库260325008</td></tr>
+        </tbody>
+      </table>
+      <div class="sec-h">售卖与收方信息</div>
+      <div class="grid">
+        <div class="fld full">
+          <label><span class="req">*</span> 售卖对象（客户/单位）</label>
+          <input id="cust" placeholder="如：XX再生资源公司">
+        </div>
+        <div class="fld">
+          <label><span class="req">*</span> 联系人</label>
+          <input id="contact" placeholder="姓名">
+        </div>
+        <div class="fld">
+          <label><span class="req">*</span> 联系电话</label>
+          <input id="phone" placeholder="手机号">
+        </div>
+        <div class="fld">
+          <label><span class="req">*</span> 售卖总价(元)</label>
+          <input type="number" id="sellPrice" value="950" step="0.01" placeholder="多条时为合计">
+        </div>
+        <div class="fld full hide-diff" id="diffBox">
+          <label><span class="req">*</span> 价格差异原因（售价低于采购价时必填）</label>
+          <textarea id="diffReason" placeholder="如：二手议价、花纹残留等"></textarea>
+        </div>
+      </div>
+      <div class="sec-h">交易凭证附件</div>
+      <p class="upload-hint">上传与本次售卖相关的交易凭证（如转账截图、过磅单、交接单照片等）。支持图片格式，<strong>最多 10 张</strong>，单张建议不超过 5MB（演示不上传服务器）。</p>
+      <div class="upload-wrap">
+        <div class="upload-zone" id="sellUploadZone" tabindex="0" role="button" aria-label="上传交易凭证">
+          <p>点击选择图片，或将文件拖拽到此处</p>
+          <p class="up-sub">仅图片 · 最多 10 张</p>
+          <input type="file" id="sellVoucherInput" accept="image/*" multiple>
+        </div>
+        <p class="att-count" id="attCount">已选 0 / 10 张</p>
+        <div class="att-list" id="attList" aria-live="polite"></div>
+      </div>
+      <div class="act">
+        <a class="btn" href="1-轮胎卡片列表.html">取消</a>
+        <button type="button" class="btn btn-p" onclick="submitSell()">确认售卖并生成收据</button>
+      </div>
+    </div>
+  </main>
+  <script>
+  var MAX_VOUCHERS=10;
+  var voucherFiles=[];
+  (function(){
+    var p=1100;
+    var inp=document.getElementById('sellPrice');
+    var box=document.getElementById('diffBox');
+    function chk(){
+      var v=parseFloat(inp.value);
+      if(isNaN(v)){box.classList.remove('show');return;}
+      box.classList.toggle('show', v < p);
+    }
+    inp.addEventListener('input',chk);
+    chk();
+  })();
+  function renderAttList(){
+    var list=document.getElementById('attList');
+    var cnt=document.getElementById('attCount');
+    list.innerHTML='';
+    voucherFiles.forEach(function(f,i){
+      var d=document.createElement('div');
+      d.className='att-item';
+      var nm=document.createElement('span');
+      nm.textContent=f.name;
+      nm.title=f.name;
+      var rm=document.createElement('span');
+      rm.className='rm';
+      rm.setAttribute('role','button');
+      rm.setAttribute('tabindex','0');
+      rm.title='移除';
+      rm.textContent='×';
+      rm.onclick=function(){voucherFiles.splice(i,1);renderAttList();};
+      d.appendChild(nm);
+      d.appendChild(rm);
+      list.appendChild(d);
+    });
+    cnt.textContent='已选 '+voucherFiles.length+' / '+MAX_VOUCHERS+' 张';
+    cnt.className='att-count'+(voucherFiles.length>=MAX_VOUCHERS?' warn':'');
+  }
+  function addVoucherFiles(fileList){
+    var incoming=[].slice.call(fileList).filter(function(f){return /^image\//i.test(f.type);});
+    if(!incoming.length)return;
+    var room=MAX_VOUCHERS-voucherFiles.length;
+    if(room<=0){alert('交易凭证最多 '+MAX_VOUCHERS+' 张');return;}
+    if(incoming.length>room){
+      alert('超出上限：还可上传 '+room+' 张，已自动截取前 '+room+' 张');
+      incoming=incoming.slice(0,room);
+    }
+    voucherFiles=voucherFiles.concat(incoming);
+    renderAttList();
+    document.getElementById('sellVoucherInput').value='';
+  }
+  (function(){
+    var zone=document.getElementById('sellUploadZone');
+    var inp=document.getElementById('sellVoucherInput');
+    zone.addEventListener('click',function(e){if(e.target!==inp)inp.click();});
+    inp.addEventListener('change',function(){if(inp.files&&inp.files.length)addVoucherFiles(inp.files);});
+    ['dragenter','dragover'].forEach(function(ev){zone.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();zone.classList.add('drag');});});
+    ['dragleave','drop'].forEach(function(ev){zone.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();zone.classList.remove('drag');});});
+    zone.addEventListener('drop',function(e){if(e.dataTransfer&&e.dataTransfer.files)addVoucherFiles(e.dataTransfer.files);});
+  })();
+  function submitSell(){
+    if(!document.getElementById('cust').value.trim()||!document.getElementById('contact').value.trim()||!document.getElementById('phone').value.trim()){alert('请完善收方信息');return;}
+    var sp=parseFloat(document.getElementById('sellPrice').value);
+    if(isNaN(sp)||sp<=0){alert('请填写有效售卖价');return;}
+    if(sp<1100 && !document.getElementById('diffReason').value.trim()){alert('售价低于采购价，请填写价格差异原因');return;}
+    var vac=voucherFiles.length;
+    alert('演示提交成功：\n• 轮胎状态 → 售卖待确认\n• 已自动创建收据 SJ202603310088（待财务审批）\n• receipt_status → 待审批\n• 交易凭证附件：'+vac+' 张（正式环境随单据一并提交）');
+    location.href='1-轮胎卡片列表.html';
+  }
+  </script>
+</body>
+</html>

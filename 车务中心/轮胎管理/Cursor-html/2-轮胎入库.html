@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮胎入库 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    a{color:#165DFF;text-decoration:none;}
+    .layout-topnav{position:fixed;top:0;left:0;right:0;height:48px;background:#2B2B6E;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 12px;z-index:100;}
+    .tn-left{display:flex;align-items:center;gap:8px;}
+    .tn-logo{color:#fff;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;}
+    .tn-logo-g{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+    .tn-tabs{display:flex;margin-left:12px;}
+    .tn-tab{color:rgba(255,255,255,.72);padding:0 16px;display:flex;align-items:center;border-bottom:2px solid transparent;height:48px;font-size:14px;}
+    .tn-tab.active{color:#fff;background:rgba(255,255,255,.1);border-bottom-color:#fff;}
+    .tn-right{display:flex;align-items:center;gap:10px;}
+    .tn-search{width:200px;height:30px;border-radius:4px;border:none;background:rgba(255,255,255,.15);color:#fff;padding:0 12px;font-size:13px;}
+    .tn-search::placeholder{color:rgba(255,255,255,.55);}
+    .tn-btn{height:30px;padding:0 12px;border-radius:4px;border:none;font-size:13px;cursor:pointer;}
+    .tn-btn-orange{background:#FF7D00;color:#fff;}
+    .tn-btn-green{background:#00B42A;color:#fff;}
+    .tn-btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);}
+    .tn-ico{color:rgba(255,255,255,.85);padding:0 4px;}
+    .tn-badge{position:absolute;top:-6px;right:-4px;background:#F53F3F;color:#fff;font-size:10px;font-style:normal;min-width:18px;height:16px;line-height:16px;text-align:center;border-radius:8px;padding:0 4px;}
+    .tn-bell{position:relative;}
+    .tn-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B5CF6,#165DFF);border:2px solid rgba(255,255,255,.4);}
+    .layout-sider{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;z-index:90;overflow-y:auto;}
+    .sd-user{display:flex;align-items:center;gap:10px;padding:14px 12px;border-bottom:1px solid #F2F3F5;}
+    .sd-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#86909C,#4E5969);}
+    .sd-name{font-size:13px;color:#1D2129;font-weight:600;}
+    .sd-org{font-size:12px;color:#86909C;margin-top:2px;}
+    .sd-menu-search{padding:8px 12px;}
+    .sd-menu-search input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+    .sd-nav{padding:4px 0 16px;}
+    .sd-item{padding:10px 16px;font-size:13px;color:#4E5969;}
+    .sd-item.sub{padding-left:28px;font-size:12px;}
+    .sd-item.active{background:#F0F5FF;color:#165DFF;font-weight:500;border-left:3px solid #165DFF;padding-left:13px;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:13px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;border-radius:0 4px 4px 0;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+    .layout-main{margin-left:200px;margin-top:48px;padding:16px 20px;min-height:calc(100vh - 48px);}
+    .bc{font-size:13px;color:#86909C;margin-bottom:12px;}
+    .bc a{color:#165DFF;}
+    .panel{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:16px 20px;margin-bottom:12px;}
+    .page-title{font-size:18px;font-weight:600;color:#1D2129;margin-bottom:4px;}
+    .hint{font-size:12px;color:#86909C;margin-bottom:16px;}
+    .alert-red{background:#FFF1F0;border:1px solid #FFCCC7;color:#CF1322;font-size:12px;padding:8px 12px;border-radius:4px;margin-bottom:16px;}
+    .sec{margin-bottom:20px;}
+    .sec-t{font-size:14px;font-weight:600;color:#1D2129;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #F2F3F5;}
+    .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 20px;}
+    .fg-item label{display:block;font-size:13px;margin-bottom:6px;}
+    .req{color:#F53F3F;}
+    .fg-item input,.fg-item select,.fg-item textarea{width:100%;height:32px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:13px;}
+    .fg-item textarea{height:72px;padding:8px 10px;resize:vertical;}
+    .fg-full{grid-column:1/-1;}
+    .mini-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .mini-table th,.mini-table td{border:1px solid #E5E6EB;padding:8px;}
+    .mini-table th{background:#F7F8FA;text-align:left;}
+    .upload-dashed{border:1px dashed #C9CDD4;border-radius:4px;padding:24px;text-align:center;color:#86909C;font-size:13px;}
+    .actions{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid #E5E6EB;margin-top:8px;}
+    .btn{height:32px;padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid transparent;}
+    .btn-primary{background:#165DFF;color:#fff;}
+    .btn-default{background:#fff;color:#4E5969;border-color:#E5E6EB;}
+  </style>
+</head>
+<body>
+  <header class="layout-topnav">
+    <div class="tn-left">
+      <div class="tn-logo"><span class="tn-logo-g">G</span> 财运通</div>
+      <nav class="tn-tabs">
+        <span class="tn-tab">首页</span>
+        <span class="tn-tab active">轮胎管理</span>
+      </nav>
+    </div>
+    <div class="tn-right">
+      <input class="tn-search" placeholder="让查询更简单">
+      <button type="button" class="tn-btn tn-btn-orange">创建订单</button>
+      <button type="button" class="tn-btn tn-btn-green">创建运单</button>
+      <button type="button" class="tn-btn tn-btn-ghost">平台跳转 ▾</button>
+      <span class="tn-ico">⚙</span>
+      <span class="tn-ico tn-bell">🔔<i class="tn-badge">120</i></span>
+      <span class="tn-avatar"></span>
+    </div>
+  </header>
+  <aside class="layout-sider">
+    <div class="sd-user">
+      <div class="sd-avatar"></div>
+      <div><div class="sd-name">超级管理员</div><div class="sd-org">智能管车集团</div></div>
+    </div>
+    <a class="sd-back" href="1-轮胎卡片列表.html">← 返回轮胎卡片列表</a>
+    <div class="sd-menu-search"><input placeholder="搜索菜单"></div>
+    <nav class="sd-nav">
+      <div class="sd-tire-tree">
+        <div class="sd-tree-h">轮胎管理</div>
+        <a class="sd-tree-item" href="1-轮胎卡片列表.html">轮胎卡片</a>
+        <a class="sd-tree-item active" href="2-轮胎入库.html">轮胎入库</a>
+        <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+        <a class="sd-tree-item" href="5-轮胎回收.html">轮胎回收</a>
+        <a class="sd-tree-item" href="6-轮胎售卖.html">轮胎售卖</a>
+        <a class="sd-tree-item" href="7-创建报销单.html">创建报销单</a>
+        <a class="sd-tree-item" href="4-轮胎详情.html">轮胎详情</a>
+        <a class="sd-tree-item" href="8-统计分析.html">数据分析</a>
+      </div>
+    </nav>
+  </aside>
+  <main class="layout-main">
+    <div class="bc"><a href="1-轮胎卡片列表.html">轮胎卡片</a> / 轮胎入库</div>
+    <div class="panel">
+      <h1 class="page-title">轮胎入库</h1>
+      <p class="hint">单条或批量入库；入库单号规则：网点名称 + YYMMDD + 4 位流水（见方案设计 §3.1）。</p>
+      <div class="alert-red">演示数据：提交后可在列表页查看新生成的「入库单号」与轮胎卡片。</div>
+      <div class="sec">
+        <div class="sec-t">基本信息</div>
+        <div class="form-grid">
+          <div class="fg-item fg-full">
+            <label><span class="req">*</span> 入库来源</label>
+            <input id="src" placeholder="供应商 / 来源说明">
+          </div>
+          <div class="fg-item">
+            <label>联系人</label>
+            <input placeholder="选填">
+          </div>
+          <div class="fg-item">
+            <label><span class="req">*</span> 入库时间</label>
+            <input type="datetime-local" value="2026-03-31T16:04">
+          </div>
+          <div class="fg-item">
+            <label><span class="req">*</span> 使用范围</label>
+            <select id="scope"><option value="1">本级及下级</option><option value="2">本级</option><option value="3">全集团</option></select>
+          </div>
+          <div class="fg-item fg-full">
+            <label>备注</label>
+            <textarea placeholder="选填"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-t">轮胎明细</div>
+        <textarea id="bulkNos" style="width:100%;height:80px;border:1px solid #E5E6EB;border-radius:4px;padding:10px;font-size:13px;margin-bottom:10px;" placeholder="批量粘贴轮胎编号（逗号、空格、换行均可）&#10;例：TL-2026-101  TL-2026-102"></textarea>
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>轮胎编号</th><th>品牌</th><th>尺寸</th><th>花纹</th><th>类型</th><th>采购价</th><th>采购日期</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr>
+              <td><input style="width:100%;border:none;" value="TL-2026-101"></td>
+              <td><input style="width:100%;border:none;" value="米其林"></td>
+              <td><input style="width:100%;border:none;" value="295/80R22.5"></td>
+              <td><input style="width:100%;border:none;" placeholder="选填"></td>
+              <td><select style="border:none;width:100%;"><option>新胎</option><option>旧胎</option></select></td>
+              <td><input style="width:100%;border:none;" value="1280"></td>
+              <td><input type="date" style="width:100%;border:none;" value="2026-03-31"></td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px;">
+          <button type="button" class="btn btn-default" id="parseBulk">解析编号到表格</button>
+          <button type="button" class="btn btn-default">批量填充选中行</button>
+        </p>
+      </div>
+      <div class="sec">
+        <div class="sec-t">附件信息</div>
+        <div class="upload-dashed">点击 / 拖拽上传（最多 10 个，单文件 ≤ 2MB）</div>
+      </div>
+      <div class="actions">
+        <a class="btn btn-default" href="1-轮胎卡片列表.html" style="display:inline-flex;align-items:center;">返回列表</a>
+        <button type="button" class="btn btn-default" onclick="alert('演示：已保存草稿')">保存草稿</button>
+        <button type="button" class="btn btn-primary" id="submitIn">确认入库</button>
+      </div>
+    </div>
+  </main>
+  <script>
+  document.getElementById('parseBulk').onclick=function(){
+    var t=document.getElementById('bulkNos').value.trim();
+    if(!t){alert('请先粘贴编号');return;}
+    var parts=t.split(/[\s,，\n\r\t]+/).filter(Boolean);
+    var tb=document.getElementById('rows');tb.innerHTML='';
+    parts.forEach(function(no){
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><input style="width:100%;border:none;" value="'+no+'"></td><td><input style="width:100%;border:none;" value="米其林"></td><td><input style="width:100%;border:none;" value="295/80R22.5"></td><td><input style="width:100%;border:none;"></td><td><select style="border:none;width:100%;"><option>新胎</option><option>旧胎</option></select></td><td><input style="width:100%;border:none;" value="1280"></td><td><input type="date" style="width:100%;border:none;" value="2026-03-31"></td>';
+      tb.appendChild(tr);
+    });
+    alert('已解析 '+parts.length+' 条编号');
+  };
+  document.getElementById('submitIn').onclick=function(){
+    if(!document.getElementById('src').value.trim()){alert('请填写入库来源');return;}
+    alert('演示入库成功。\n入库单号：总部仓库2603310042\n状态：入库（在库）');
+    location.href='1-轮胎卡片列表.html';
+  };
+  </script>
+</body>
+</html>

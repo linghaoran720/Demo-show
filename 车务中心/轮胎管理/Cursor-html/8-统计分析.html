@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮胎统计分析 - 财运通</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:PingFang SC,Microsoft YaHei,sans-serif;font-size:14px;color:#4E5969;background:#F2F3F5;min-width:1280px;line-height:1.5;}
+    .top{position:fixed;top:0;left:0;right:0;height:48px;background:#2B2B6E;display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:100;color:#fff;}
+    .tl{display:flex;align-items:center;gap:8px;font-weight:600;}
+    .tg{background:#fff;color:#2B2B6E;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+    .sd{position:fixed;left:0;top:48px;bottom:0;width:200px;background:#fff;border-right:1px solid #E5E6EB;z-index:90;overflow-y:auto;}
+    .sd-back{display:block;margin:8px 12px 10px;padding:8px 10px;font-size:13px;color:#165DFF;background:#F0F5FF;border-radius:4px;text-decoration:none;border:1px solid #BEDAFF;}
+    .sd-back:hover{background:#E8F3FF;}
+    .sd-ms2{padding:0 12px 8px;}
+    .sd-ms2 input{width:100%;height:30px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:12px;}
+    .sd-tire-tree{border-top:1px solid #F2F3F5;padding:8px 0 12px;}
+    .sd-tree-h{font-size:12px;font-weight:600;color:#1D2129;padding:6px 16px;}
+    .sd-tree-item{display:block;padding:8px 14px 8px 22px;font-size:12px;color:#4E5969;text-decoration:none;border-left:3px solid transparent;margin:0 8px;}
+    .sd-tree-item:hover{background:#F7F8FA;color:#165DFF;}
+    .sd-tree-item.active{background:#F0F5FF;color:#165DFF;border-left-color:#165DFF;font-weight:500;}
+    .su{padding:14px 12px;display:flex;gap:10px;border-bottom:1px solid #F2F3F5;font-size:13px;}
+    .a36{width:36px;height:36px;border-radius:50%;background:#86909C;}
+    .m{margin-left:200px;margin-top:48px;padding:16px 20px;}
+    .bc{color:#86909C;font-size:13px;margin-bottom:12px;}
+    .bc a{color:#165DFF;}
+    .row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+    .kpi{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:16px;}
+    .kpi .l{font-size:13px;color:#86909C;}
+    .kpi .v{font-size:22px;font-weight:600;color:#1D2129;margin-top:6px;}
+    .panel{background:#fff;border:1px solid #E5E6EB;border-radius:4px;padding:16px 20px;margin-bottom:12px;}
+    .pt{font-size:15px;font-weight:600;color:#1D2129;margin-bottom:14px;}
+    .filt{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:flex-end;}
+    .filt label{font-size:13px;margin-right:6px;}
+    .filt input,.filt select{height:32px;border:1px solid #E5E6EB;border-radius:4px;padding:0 10px;font-size:13px;}
+    .btn{height:32px;padding:0 14px;border-radius:4px;border:none;background:#165DFF;color:#fff;font-size:13px;cursor:pointer;}
+    .chart-h{height:220px;display:flex;align-items:flex-end;gap:12px;padding:16px 8px 0;border-bottom:1px solid #F2F3F5;}
+    .bar{flex:1;background:linear-gradient(180deg,#4080FF,#165DFF);border-radius:4px 4px 0 0;min-height:20px;position:relative;}
+    .bar span{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:11px;color:#86909C;}
+    .tbl{width:100%;border-collapse:collapse;font-size:13px;}
+    .tbl th,.tbl td{border-bottom:1px solid #F2F3F5;padding:10px 8px;text-align:left;}
+    .tbl th{background:#F7F8FA;color:#1D2129;font-weight:600;}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="tl"><span class="tg">G</span> 财运通</div>
+    <input placeholder="让查询更简单" style="width:200px;height:30px;border:none;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;padding:0 12px;font-size:13px;">
+  </header>
+  <aside class="sd">
+    <div class="su"><div class="a36"></div><div><strong style="display:block;color:#1D2129;">超级管理员</strong><span style="font-size:12px;color:#86909C;">智能管车集团</span></div></div>
+    <a class="sd-back" href="1-轮胎卡片列表.html">← 返回轮胎卡片列表</a>
+    <div class="sd-ms2"><input placeholder="搜索菜单"></div>
+    <nav class="sd-tire-tree">
+      <div class="sd-tree-h">轮胎管理</div>
+      <a class="sd-tree-item" href="1-轮胎卡片列表.html">轮胎卡片</a>
+      <a class="sd-tree-item" href="2-轮胎入库.html">轮胎入库</a>
+      <a class="sd-tree-item" href="3-轮胎领用.html">轮胎领用</a>
+      <a class="sd-tree-item" href="5-轮胎回收.html">轮胎回收</a>
+      <a class="sd-tree-item" href="6-轮胎售卖.html">轮胎售卖</a>
+      <a class="sd-tree-item" href="7-创建报销单.html">创建报销单</a>
+      <a class="sd-tree-item" href="4-轮胎详情.html">轮胎详情</a>
+      <a class="sd-tree-item active" href="8-统计分析.html">数据分析</a>
+    </nav>
+  </aside>
+  <main class="m">
+    <div class="bc"><a href="1-轮胎卡片列表.html">轮胎卡片</a> / 统计分析</div>
+    <div class="row">
+      <div class="kpi"><div class="l">库存成本（在库+已回收可支配）</div><div class="v">¥ 428.6万</div></div>
+      <div class="kpi"><div class="l">已领用资产原值</div><div class="v">¥ 612.1万</div></div>
+      <div class="kpi"><div class="l">本年累计卖出回款</div><div class="v">¥ 38.4万</div></div>
+      <div class="kpi"><div class="l">累计维修成本</div><div class="v">¥ 12.7万</div></div>
+    </div>
+    <div class="panel">
+      <div class="pt">维度筛选</div>
+      <div class="filt">
+        <div><label>组织</label><select><option>全集团</option><option>总部仓库</option><option>北京分公司</option></select></div>
+        <div><label>时间</label><input type="month" value="2026-03"></div>
+        <button type="button" class="btn" onclick="alert('演示：刷新图表与表格')">查询</button>
+      </div>
+    </div>
+    <div class="two">
+      <div class="panel">
+        <div class="pt">品牌分布（条数）</div>
+        <div class="chart-h">
+          <div class="bar" style="height:65%"><span>米其林</span></div>
+          <div class="bar" style="height:45%"><span>固特异</span></div>
+          <div class="bar" style="height:38%"><span>朝阳</span></div>
+          <div class="bar" style="height:28%"><span>其他</span></div>
+        </div>
+        <p style="font-size:12px;color:#86909C;padding:28px 8px 8px;">PRD：支持库存、成本、生命周期多维度分析；本页为静态示意。</p>
+      </div>
+      <div class="panel">
+        <div class="pt">车辆轮胎消耗 TOP（领用次数）</div>
+        <table class="tbl">
+          <thead><tr><th>排名</th><th>车牌号</th><th>领用次数</th><th>累计采购成本</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>京A12345</td><td>14</td><td>¥ 52,300</td></tr>
+            <tr><td>2</td><td>京B67890</td><td>11</td><td>¥ 41,200</td></tr>
+            <tr><td>3</td><td>冀C90876</td><td>9</td><td>¥ 36,800</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="pt">状态结构快照</div>
+      <table class="tbl">
+        <thead><tr><th>状态</th><th>条数</th><th>占比</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>入库</td><td>156</td><td>18%</td><td>可领用/可直售</td></tr>
+          <tr><td>已领用</td><td>324</td><td>38%</td><td>需先回收方可报废规则内流转</td></tr>
+          <tr><td>已回收</td><td>89</td><td>10%</td><td>可再领用、作废、售卖</td></tr>
+          <tr><td>售卖待确认</td><td>12</td><td>1.4%</td><td>等财务收据审批</td></tr>
+          <tr><td>已卖出</td><td>42</td><td>5%</td><td>终态</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>
