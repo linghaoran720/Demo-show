@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能建单 v1.0 · MVP Demo（PRD v4.0.16 · 双端）</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --primary:#165DFF;--primary-h:#4080FF;--nav:#2B2B6E;
+  --text:#1D2129;--sub:#4E5969;--hint:#86909C;--border:#E5E6EB;
+  --bg:#F2F3F5;--white:#fff;--ok:#00B42A;--warn:#FF7D00;--err:#F53F3F;
+  --r:8px;--font:'PingFang SC','Microsoft YaHei',sans-serif;
+}
+body{margin:0;font-family:var(--font);background:#E8EAED;color:var(--text);min-height:100vh}
+.demo-bar{background:linear-gradient(90deg,#1a1a3e,var(--nav));color:#fff;padding:12px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.demo-bar h1{margin:0;font-size:16px;font-weight:600}
+.demo-bar .desc{margin:0;font-size:12px;opacity:.9;flex:1;min-width:240px;line-height:1.5}
+.demo-bar .tag{font-size:11px;background:rgba(255,255,255,.18);padding:2px 8px;border-radius:4px}
+.demo-bar .case-btns{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.case-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}
+.case-btn:hover{background:rgba(255,255,255,.28)}
+.dual-stage{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:28px;padding:24px 16px 40px;max-width:1600px;margin:0 auto}
+.stage-label{font-size:12px;color:var(--hint);margin-bottom:10px;font-weight:500}
+.phone-wrap{flex:0 0 auto}
+.phone-mockup{width:375px;max-width:100%;background:#1f1f1f;border-radius:40px;padding:12px;box-shadow:0 20px 50px rgba(0,0,0,.28);position:relative}
+.phone-mockup::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#1f1f1f;border-radius:0 0 18px 18px;z-index:5}
+.phone-screen{width:100%;height:780px;background:var(--white);border-radius:32px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.m-header{flex-shrink:0;height:48px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--white);padding-top:8px}
+.m-header .title{font-size:15px;font-weight:600}
+.m-header .sub{font-size:11px;color:var(--hint)}
+.m-header .m-clear{font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;padding:4px 8px;font-family:inherit}
+.m-messages{flex:1;overflow-y:auto;padding:12px;background:var(--bg)}
+.m-input-zone{flex-shrink:0;border-top:1px solid var(--border);background:var(--white)}
+.m-toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px 0}
+.m-toolbar .tb{font-size:12px;padding:5px 10px}
+.m-compose{display:flex;align-items:flex-end;gap:8px;padding:10px 12px 12px}
+.m-compose textarea{flex:1;min-height:40px;max-height:88px;border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;font-size:14px;resize:none;font-family:inherit}
+.m-compose textarea:focus{outline:none;border-color:var(--primary)}
+.m-compose textarea:disabled{background:#FAFAFA;color:var(--hint)}
+.m-submit{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:var(--primary);color:#fff;cursor:pointer;font-size:14px;font-weight:600;padding:0;display:none;align-items:center;justify-content:center;font-family:inherit}
+.m-submit.show{display:flex}
+.m-submit:disabled{opacity:.45;cursor:not-allowed}
+.m-hint{font-size:11px;color:var(--hint);padding:0 12px 8px}
+.pc-wrap{flex:1 1 520px;min-width:300px;max-width:920px}
+.shell{display:contents}
+.pc-card{background:var(--white);border-radius:var(--r);box-shadow:0 4px 24px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;height:780px}
+.pc-top{height:48px;background:var(--nav);color:#fff;display:flex;align-items:center;padding:0 16px;gap:12px;font-size:14px;flex-shrink:0}
+.pc-top .logo{font-weight:600;padding-right:12px;border-right:1px solid rgba(255,255,255,.2)}
+.pc-body{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--bg);padding:12px}
+.thread{flex:1;overflow-y:auto;background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px}
+.input-stack{background:var(--white);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;flex-shrink:0}
+.input-stack textarea{width:100%;min-height:72px;border:none;padding:10px 12px;font-size:14px;resize:vertical;font-family:inherit;display:block}
+.input-stack textarea:focus{outline:none}
+.input-stack textarea:disabled{background:#FAFAFA;color:var(--hint)}
+.toolbar{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--border);background:#FAFBFC;flex-wrap:wrap}
+.toolbar .grow{flex:1}
+.tb{border:1px solid var(--border);background:var(--white);border-radius:4px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--sub)}
+.tb:hover{border-color:var(--primary);color:var(--primary)}
+.tb:disabled{opacity:.45;cursor:not-allowed}
+.tb.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tb.primary:hover{background:var(--primary-h);color:#fff}
+.bubble{max-width:95%;margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:14px;line-height:1.55;word-break:break-word}
+.phone-screen .bubble{max-width:100%;font-size:13px}
+.phone-screen .field-list,.phone-screen .cap-grid{grid-template-columns:1fr}
+.phone-screen .wb-head{font-size:12px}
+.phone-screen .route-meta{font-size:11px}
+.bubble.user{margin-left:auto;background:#E8F3FF}
+.bubble.bot{margin-right:auto;background:var(--white);border:1px solid var(--border);color:var(--sub)}
+.round-block{margin-top:4px}
+.summary-line{font-size:13px;color:var(--sub);margin:8px 0 10px;padding:8px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.wb-card{border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;background:var(--white);overflow:hidden}
+.wb-card.compact{border-color:#BEDAFF}
+.wb-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 12px;background:#FAFBFC;border-bottom:1px solid var(--border)}
+.wb-head .left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wb-head .chk{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;font-size:13px}
+.wb-head .chk input{accent-color:var(--primary)}
+.badge-ok{font-size:11px;font-weight:600;color:var(--ok);background:#E8FFEA;padding:2px 8px;border-radius:4px}
+.badge-fail{font-size:11px;font-weight:600;color:#D25F00;background:#FFF7E8;padding:2px 8px;border-radius:4px}
+.head-right{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:10px}
+.link-copy{border:none;background:none;color:var(--primary);cursor:pointer;font-size:13px;padding:0;font-family:inherit;text-decoration:underline}
+.route-meta{font-size:12px;color:var(--hint);padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg)}
+.section{padding:10px 12px}
+.section-title{font-size:12px;font-weight:600;color:var(--hint);margin-bottom:8px;text-transform:none;letter-spacing:.02em}
+.field-list{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#F7F8FA}
+.fl-cell{padding:8px 10px;border-bottom:1px solid #ECEEF0;font-size:12px}
+.fl-cell:nth-last-child(-n+2){border-bottom:none}
+.fl-lab{color:var(--hint);font-size:11px;margin-bottom:4px}
+.fl-val{color:var(--text);font-weight:500;min-height:18px;word-break:break-all}
+.fl-val.empty{color:#C9CDD4;font-weight:400}
+.fl-inp{width:100%;border:1px solid var(--primary);border-radius:4px;padding:4px 8px;font-size:13px;font-family:inherit}
+.cap-block{border:1px dashed var(--border);border-radius:6px;padding:10px;margin-bottom:8px;background:#FAFBFC}
+.cap-block:last-child{margin-bottom:0}
+.cap-title{font-size:13px;font-weight:600;margin-bottom:8px}
+.cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:12px}
+.cap-row{display:flex;flex-direction:column;gap:3px}
+.cap-row .lab{color:var(--hint);font-size:11px}
+.cap-row .val{font-weight:500;min-height:18px}
+.cap-row input,.cap-row select{border:1px solid var(--border);border-radius:4px;padding:4px 8px;font-size:13px;font-family:inherit;width:100%}
+.cap-row input:focus{border-color:var(--primary);outline:none}
+.build-row{margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);display:flex;align-items:center;gap:8px;font-size:12px}
+.build-row input{width:52px;text-align:center}
+.card-foot{padding:8px 12px;text-align:right;border-top:1px solid var(--border)}
+.link-edit{border:none;background:none;color:var(--primary);cursor:pointer;font-size:13px;font-family:inherit}
+.warn{margin:0 12px 10px;padding:8px 10px;background:#FFF7E8;border:1px solid var(--warn);border-radius:4px;font-size:12px;color:#D25F00;line-height:1.45}
+.result-foot{margin-top:12px;padding:12px;background:linear-gradient(180deg,#F5F9FF,#EEF4FF);border:1px solid #BEDAFF;border-radius:10px;display:flex;justify-content:flex-end}
+.btn-build{border:none;border-radius:22px;padding:10px 22px;font-size:14px;font-weight:600;color:#fff;background:linear-gradient(135deg,#4080FF,#165DFF);cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(22,93,255,.25)}
+.btn-build:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn-build.hidden{display:none}
+.detached-panel{margin-top:10px;padding:12px;background:#F7F9FC;border:1px solid var(--primary);border-radius:10px}
+.detached-hint{font-size:12px;color:var(--sub);margin:0 0 10px;line-height:1.5}
+.progress-wrap{margin-top:10px}
+.progress-text{font-size:12px;color:var(--hint);margin-bottom:6px}
+.progress-bar{height:8px;background:#E5E6EB;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#722ED1,#165DFF);border-radius:4px;transition:width .12s linear}
+.outcome{margin-top:10px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+.link-fail{color:var(--primary);cursor:pointer;text-decoration:underline;margin-left:4px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(29,33,41,.92);color:#fff;padding:10px 20px;border-radius:var(--r);font-size:14px;z-index:2000;opacity:0;transition:.25s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--white);border-radius:var(--r);width:640px;max-width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.modal.modal-wide{width:760px;max-height:90vh}
+.modal-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-head h2{margin:0;font-size:16px}
+.modal-head .x{border:none;background:none;font-size:22px;color:var(--hint);cursor:pointer}
+.cfg-tab-bar{display:flex;gap:4px;padding:0 18px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--white)}
+.cfg-tab{padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--sub);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
+.cfg-tab.active{color:var(--primary);font-weight:600;border-bottom-color:var(--primary)}
+.modal-body{padding:14px 18px;overflow-y:auto;flex:1}
+.cfg-panel{display:none}
+.cfg-panel.active{display:block}
+.field-tile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.field-tile{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#FAFBFC;cursor:pointer;user-select:none}
+.field-tile input{accent-color:var(--primary);flex-shrink:0;margin:0}
+.field-tile:hover{border-color:#BEDAFF;background:#F5F9FF}
+.field-hint{font-size:12px;color:var(--hint);margin:0 0 12px;line-height:1.55}
+.config-intro{margin:0 0 12px;padding:10px 12px;background:#f7f8fa;border:1px solid var(--border);border-radius:8px;font-size:12px;line-height:1.65;color:var(--text)}
+.config-intro strong{color:var(--sub)}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+.shortcut-table{width:100%;border-collapse:collapse;font-size:13px}
+.shortcut-table th,.shortcut-table td{border:1px solid var(--border);padding:8px}
+.shortcut-table input,.shortcut-table textarea{width:100%;border:1px solid var(--border);border-radius:4px;padding:6px;font-family:inherit;font-size:13px}
+.shortcut-table textarea{min-height:48px;resize:vertical}
+.tpl-list-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.tpl-list-head h3{margin:0;font-size:14px;font-weight:600}
+.user-scope{font-size:11px;color:var(--hint);margin:0 0 10px}
+.tpl-field-form{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tpl-route-zone{border-bottom:1px solid var(--border);background:var(--white)}
+.tpl-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--border)}
+.float-field{position:relative;padding:12px 10px 8px;border-bottom:1px solid var(--border);min-height:54px;background:var(--white)}
+.tpl-field-grid .float-field:nth-child(odd){border-right:1px solid var(--border)}
+.float-field.readonly{background:#F7F8FA}
+.float-field.readonly .ff-input{cursor:default;color:var(--text)}
+.ff-label{position:absolute;left:10px;right:10px;transition:all .15s ease;color:var(--hint);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.float-field:not(.has-value):not(.focused) .ff-label{font-size:15px;top:50%;transform:translateY(-50%);color:#C9CDD4}
+.float-field.has-value .ff-label,.float-field.focused .ff-label{font-size:11px;top:8px;transform:none;color:var(--hint)}
+.ff-input{width:100%;border:none;background:transparent;font-size:15px;font-weight:600;padding:16px 0 2px;outline:none;font-family:inherit;color:var(--text)}
+.float-field:not(.has-value):not(.focused) .ff-input{height:0;padding:0;opacity:0}
+.float-field.readonly .ff-input{padding-top:14px}
+.ff-chev{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--hint);pointer-events:none}
+.float-field.has-value .ff-chev,.float-field.focused .ff-chev{top:22px;transform:none}
+.tpl-route-row{display:grid;grid-template-columns:1fr 1fr}
+.tpl-route-row .float-field{border-right:1px solid var(--border)}
+.tpl-route-row .float-field:last-child{border-right:none}
+.modal-bg.cfg-mobile{align-items:flex-end;padding:0;background:rgba(0,0,0,.45)}
+.modal-bg.cfg-mobile .modal.modal-wide{width:100%;max-width:351px;border-radius:14px 14px 0 0;max-height:86vh;margin:0 auto}
+.modal-bg.cfg-mobile .field-tile-grid{grid-template-columns:repeat(2,1fr)}
+.modal-bg.cfg-mobile .cfg-tab-bar{padding:0 12px;overflow-x:auto}
+.modal-bg.cfg-mobile .cfg-tab{padding:10px 12px;font-size:12px;white-space:nowrap}
+.modal-bg.cfg-mobile .modal-body,.modal-bg.cfg-mobile .modal-head,.modal-bg.cfg-mobile .modal-foot{padding-left:14px;padding-right:14px}
+.modal-bg.cfg-mobile .shortcut-table thead{display:none}
+.modal-bg.cfg-mobile .shortcut-table,.modal-bg.cfg-mobile .shortcut-table tbody,.modal-bg.cfg-mobile .shortcut-table tr{display:block;width:100%}
+.modal-bg.cfg-mobile .shortcut-table tr{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;padding:10px 12px;background:#FAFBFC}
+.modal-bg.cfg-mobile .shortcut-table td{display:block;border:none;padding:0;text-align:left}
+.modal-bg.cfg-mobile .shortcut-table td+td{margin-top:6px}
+.modal-bg.cfg-mobile .shortcut-table td:last-child{margin-top:10px;text-align:right}
+.modal-bg.cfg-mobile .tpl-summary{max-width:none;white-space:normal;text-overflow:unset;overflow:visible;line-height:1.5;color:var(--sub);font-size:13px}
+.modal-bg.cfg-pc{align-items:center;padding:20px}
+.tpl-field-inp{width:100%;border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:13px;font-family:inherit}
+.tpl-field-inp:focus{outline:none;border-color:var(--primary)}
+.tpl-search-list{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--white);border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:140px;overflow-y:auto;z-index:10;display:none}
+.tpl-search-list.show{display:block}
+.tpl-search-item{padding:8px 10px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border)}
+.tpl-search-item:last-child{border-bottom:none}
+.tpl-search-item:hover{background:#F5F9FF;color:var(--primary)}
+.tpl-editor-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+.tpl-summary{font-size:12px;color:var(--sub);line-height:1.55;word-break:break-word;display:block}
+.modal-bg.cfg-pc .shortcut-table td:nth-child(2){max-width:360px}
+.confirm-box{width:420px;max-width:96vw}
+.confirm-box .modal-body p{margin:0;font-size:14px;line-height:1.65}
+@media(max-width:640px){.field-list,.cap-grid{grid-template-columns:1fr}.tpl-field-grid{grid-template-columns:1fr}.tpl-route-row{grid-template-columns:1fr}}
+@media(max-width:900px){.dual-stage{flex-direction:column;align-items:stretch}.phone-mockup{margin:0 auto}.pc-wrap{max-width:none}}
+</style>
+</head>
+<body>
+
+<header class="demo-bar">
+  <h1>智能建单 v1.0</h1>
+  <span class="tag">PRD v4.0.16</span>
+  <p class="desc">双端同链 · 装货地/卸货地 · 模板车线带入 · 双列浮动标签 · 移动/PC 配置弹窗区分 · 模板列表摘要仅展示字段值（；分隔）。</p>
+  <div class="case-btns">
+    <button type="button" class="case-btn" data-case="harbin">TC-01 哈尔滨温州</button>
+    <button type="button" class="case-btn" data-case="multiRoute">TC-02 双线路</button>
+    <button type="button" class="case-btn" data-case="multiCap">TC-03 同线路多运力</button>
+    <button type="button" class="case-btn" data-case="zeroBuild">TC-04 建单数量 0</button>
+  </div>
+</header>
+
+<main class="dual-stage">
+  <div class="phone-wrap">
+    <div class="stage-label">移动端 · §6.4 纯文本 + 录单配置 + 提交显隐</div>
+    <div class="phone-mockup">
+      <div class="phone-screen">
+        <div class="m-header">
+          <div>
+            <div class="title">智能录单助手</div>
+            <div class="sub">运单文本识别</div>
+          </div>
+          <button type="button" class="m-clear" id="mClear">清空</button>
+        </div>
+        <div class="m-messages" id="mThread"></div>
+        <div class="m-input-zone">
+          <div class="m-toolbar">
+            <button type="button" class="tb" id="btnRecordCfgM">录单配置</button>
+          </div>
+          <div class="m-compose">
+            <textarea id="mInputText" placeholder="在此处粘贴或输入运单信息" rows="2"></textarea>
+            <button type="button" class="m-submit" id="btnSubmitM" title="提交">提交</button>
+          </div>
+          <div class="m-hint">输入非空时显示「提交」；识别中提交禁用。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pc-wrap">
+    <div class="stage-label">PC Web · §6.5 多行文本 + 录单配置 + 发送</div>
+    <div class="pc-card">
+      <div class="pc-top"><span class="logo">G 财运通</span><span>创建运单 · 智能录单助手</span></div>
+      <div class="pc-body">
+        <div class="thread" id="thread"></div>
+        <div class="input-stack">
+          <textarea id="inputText" placeholder="在这里输入运单描述信息，shift + 回车 = 换行" rows="3"></textarea>
+          <div class="toolbar">
+            <button type="button" class="tb" id="btnRecordCfg">录单配置</button>
+            <button type="button" class="tb" id="btnClear">清空</button>
+            <span class="grow"></span>
+            <button type="button" class="tb primary" id="btnSend">发送</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-bg" id="modalRecordCfg">
+  <div class="modal modal-wide">
+    <div class="modal-head"><h2>录单配置</h2><button type="button" class="x" id="recordCfgClose">×</button></div>
+    <div class="cfg-tab-bar">
+      <button type="button" class="cfg-tab active" data-panel="panelField">运单字段配置</button>
+      <button type="button" class="cfg-tab" data-panel="panelTpl">创建录单模板</button>
+    </div>
+    <div class="modal-body">
+      <div id="panelField" class="cfg-panel active">
+        <p class="user-scope">当前配置用户：<strong>演示用户 A</strong>（用户维度，不同用户互不影响）</p>
+        <p class="field-hint">勾选助手识别与结果卡片需展示的字段；字段平铺展示，保存后下一轮识别生效。</p>
+        <div class="field-tile-grid" id="fieldCfgGrid"></div>
+      </div>
+      <div id="panelTpl" class="cfg-panel">
+        <div id="tplListView">
+          <p class="user-scope">当前配置用户：<strong>演示用户 A</strong></p>
+          <div class="config-intro">
+            <strong>录单模板</strong>：维护 <strong>简称</strong> 及各 <strong>已启用字段</strong> 的预填值；对话中提到简称时合并进识别上下文；与原文冲突以原文为准。
+          </div>
+          <div class="tpl-list-head">
+            <h3>已保存模板</h3>
+            <button type="button" class="tb primary" id="tplAddNew">+ 新增</button>
+          </div>
+          <table class="shortcut-table"><thead><tr><th style="width:22%">简称</th><th>已填字段摘要</th><th style="width:120px">操作</th></tr></thead><tbody id="tplListBody"></tbody></table>
+        </div>
+        <div id="tplEditorView" style="display:none">
+          <p class="field-hint" id="tplEditorTitle">新增录单模板</p>
+          <label style="display:block;margin-bottom:12px;font-size:13px">简称 <input type="text" id="tplShortcutInp" class="tpl-field-inp" placeholder="如：北京白钢" style="margin-top:6px"></label>
+          <div class="tpl-field-form" id="tplFieldForm"></div>
+          <div class="tpl-editor-actions">
+            <button type="button" class="tb" id="tplEditorCancel">取消</button>
+            <button type="button" class="tb primary" id="tplEditorSave">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button type="button" class="tb" id="recordCfgCancel">取消</button><button type="button" class="tb primary" id="recordCfgOk">确定</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalTplDelete" style="z-index:1100">
+  <div class="modal confirm-box">
+    <div class="modal-head"><h2>删除录单模板</h2></div>
+    <div class="modal-body"><p>删除后不可恢复，请确认删除！</p></div>
+    <div class="modal-foot">
+      <button type="button" class="tb" id="tplDelCancel">取消</button>
+      <button type="button" class="tb primary" id="tplDelOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var CASE_TEXT = {
+    harbin: '4月24日，哈尔滨—温州，沪GA1181，辽 H78J5 挂，叶洪瑞，电话 18743828833 ，周波，电话 18643005638\n运费：25000，途径河南；不死猪奖励 300；卸货付款，装货联系：18068726821',
+    multiRoute: '组A：装北京顺义，卸唐山丰南，京B99880 李强 13812340001 ×2\n组B：装天津滨海，卸沧州高新，鲁C99999 孙七 13922223333',
+    multiCap: '成都-广州，川A00002 王师傅 13800001111 4趟\n川A00003 赵四 13700002222 *2',
+    zeroBuild: '上海-杭州，沪A88888 张三 13900000001，本单仅识别不建单（建单数量改 0 验证）'
+  };
+
+  var FIELD_DEFS = [
+    { id:'route_name', label:'车线名称', zone:'route', enabled:true, order:1 },
+    { id:'loading_place', label:'装货地', zone:'route', enabled:true, order:2 },
+    { id:'unloading_place', label:'卸货地', zone:'route', enabled:true, order:3 },
+    { id:'project_name', label:'项目名称', zone:'route', enabled:true, order:4 },
+    { id:'customer_name', label:'客户名称', zone:'route', enabled:true, order:5 },
+    { id:'cargo_name', label:'货物名称', zone:'route', enabled:true, order:6 },
+    { id:'weight_ton', label:'重量(吨)', zone:'route', enabled:true, order:7 },
+    { id:'volume_cbm', label:'体积(方)', zone:'route', enabled:true, order:8 },
+    { id:'freight_receivable', label:'应收运输费', zone:'route', enabled:false, order:9 },
+    { id:'plate_no', label:'车牌号', zone:'cap', enabled:true },
+    { id:'trailer_no', label:'挂车牌号', zone:'cap', enabled:true },
+    { id:'driver_name', label:'主驾司机', zone:'cap', enabled:true },
+    { id:'driver_phone', label:'主驾司机电话', zone:'cap', enabled:true },
+    { id:'co_driver', label:'副驾司机', zone:'cap', enabled:true },
+    { id:'co_driver_phone', label:'副驾司机电话', zone:'cap', enabled:true },
+    { id:'escort', label:'押运员', zone:'cap', enabled:false },
+    { id:'escort_phone', label:'押运员手机号', zone:'cap', enabled:false },
+    { id:'freight_payable', label:'应付运输费', zone:'route', enabled:false, order:10 },
+    { id:'waybill_remark', label:'运单备注', zone:'route', enabled:true, order:11, defaultValue:'' }
+  ];
+
+  var ROUTE_MAP = {
+    '哈尔滨至温州': { loading:'哈尔滨', unloading:'温州' },
+    '北京钢厂→唐山库': { loading:'北京', unloading:'唐山' },
+    '成都→广州': { loading:'成都', unloading:'广州' },
+    '天津滨海→沧州高新': { loading:'天津滨海', unloading:'沧州高新' }
+  };
+
+  var CAP_ORDER = ['plate_no','trailer_no','driver_name','driver_phone','co_driver','co_driver_phone','escort','escort_phone'];
+
+  var MOCK_SEARCH = {
+    route_name: ['哈尔滨至温州', '北京钢厂→唐山库', '成都→广州', '天津滨海→沧州高新'],
+    customer_name: ['华北钢贸', 'G7易流', '浩瀚物流'],
+    project_name: ['硬件设备', '白钢项目', '冷链运输'],
+    cargo_name: ['白钢卷', '螺纹钢', '普货'],
+    loading_place: ['哈尔滨', '北京顺义XX物流园', '成都'],
+    unloading_place: ['温州', '唐山丰南', '广州'],
+    plate_no: ['沪GA1181', '京B99880', '川A00002'],
+    driver_name: ['叶洪瑞', '李强', '王师傅']
+  };
+  var SEARCH_FIELD_IDS = ['route_name','customer_name','project_name','cargo_name','plate_no','driver_name'];
+
+  var state = {
+    messages: [],
+    rounds: [],
+    fieldDefs: JSON.parse(JSON.stringify(FIELD_DEFS)),
+    templates: [{
+      id: 't1',
+      shortcut: '北京白钢',
+      fieldValues: {
+        route_name: '北京钢厂→唐山库',
+        loading_place: '北京',
+        unloading_place: '唐山',
+        customer_name: '华北钢贸',
+        cargo_name: '白钢卷'
+      }
+    }],
+    recognizing: false,
+    wbSeq: 880001,
+    tplEditor: { mode: null, editId: null, draft: { shortcut: '', fieldValues: {} } },
+    pendingTplDeleteId: null
+  };
+
+  var threadPc = document.getElementById('thread');
+  var threadM = document.getElementById('mThread');
+  var inputText = document.getElementById('inputText');
+  var mInputText = document.getElementById('mInputText');
+  var btnSend = document.getElementById('btnSend');
+  var btnSubmitM = document.getElementById('btnSubmitM');
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+
+  function syncInputs(fromPc){
+    if(fromPc) mInputText.value = inputText.value;
+    else inputText.value = mInputText.value;
+    refreshSubmitState();
+  }
+
+  function refreshSubmitState(){
+    var hasText = inputText.value.trim().length > 0;
+    var busy = state.recognizing;
+    btnSend.disabled = busy || !hasText;
+    inputText.disabled = busy;
+    mInputText.disabled = false;
+    btnSubmitM.classList.toggle('show', hasText);
+    btnSubmitM.disabled = busy || !hasText;
+  }
+
+  function showToast(t){
+    toastEl.textContent = t;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2200);
+  }
+
+  function esc(s){ var d=document.createElement('div'); d.textContent=s==null?'':String(s); return d.innerHTML; }
+
+  function enabledFieldsSorted(){
+    var route = state.fieldDefs.filter(function(f){ return f.enabled && f.zone==='route'; })
+      .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+    var cap = CAP_ORDER.map(function(id){ return state.fieldDefs.find(function(f){ return f.id===id && f.enabled; }); }).filter(Boolean);
+    return route.concat(cap);
+  }
+
+  function findHitShortcuts(text){
+    var hits = [];
+    var t = text || '';
+    state.templates.forEach(function(tpl){
+      if(tpl.shortcut && t.indexOf(tpl.shortcut) !== -1) hits.push(tpl);
+    });
+    return hits.sort(function(a,b){ return (b.shortcut||'').length - (a.shortcut||'').length; });
+  }
+
+  function templateValuesLine(tpl){
+    var parts = [];
+    enabledFieldsSorted().forEach(function(f){
+      var v = tpl.fieldValues && tpl.fieldValues[f.id];
+      if(v) parts.push(v);
+    });
+    return parts.join('；');
+  }
+
+  function isCfgMobile(){
+    return document.getElementById('modalRecordCfg').classList.contains('cfg-mobile');
+  }
+
+  function tplSummary(tpl){
+    var s = templateValuesLine(tpl);
+    return s || '（未填字段）';
+  }
+
+  function filterFieldValuesToEnabled(fv){
+    var out = {};
+    enabledFieldsSorted().forEach(function(f){
+      if(fv && fv[f.id]) out[f.id] = fv[f.id];
+    });
+    return out;
+  }
+
+  function enabledRouteFields(){
+    return state.fieldDefs.filter(function(f){ return f.enabled && f.zone==='route'; })
+      .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+  }
+  function enabledCapFields(){
+    return CAP_ORDER.map(function(id){ return state.fieldDefs.find(function(f){ return f.id===id && f.enabled; }); }).filter(Boolean);
+  }
+  function isRemarkEnabled(){ return !!state.fieldDefs.find(function(f){ return f.id==='waybill_remark' && f.enabled; }); }
+
+  function effectiveBuildCount(v){
+    if(v===''||v==null||v===undefined) return 0;
+    var n = parseInt(v,10);
+    if(isNaN(n)||n<0) return 0;
+    if(n>9) return 10;
+    return n;
+  }
+
+  function parseText(text){
+    var t = text || '';
+    var groups = [];
+    if(/哈尔滨|温州|沪GA1181/i.test(t)){
+      groups.push(makeGroup(1,{
+        route:{ loading_place:'哈尔滨', unloading_place:'温州', route_name:'哈尔滨至温州', freight_receivable:'25000', waybill_remark: isRemarkEnabled()?'途径河南；不死猪奖励 300；卸货付款，装货联系：18068726821':'' },
+        items:[{ plate_no:'沪GA1181', trailer_no:'辽H78J5挂', driver_name:'叶洪瑞', driver_phone:'18743828833', co_driver:'周波', co_driver_phone:'18643005638', buildCount:1 }]
+      }));
+    } else if(/组A|北京顺义/i.test(t)){
+      groups.push(makeGroup(1,{ route:{ loading_place:'北京顺义', unloading_place:'唐山丰南', route_name:'北京→唐山', cargo_name:'白钢卷', weight_ton:'28' }, items:[{ plate_no:'京B99880', driver_name:'李强', driver_phone:'13812340001', buildCount:2 }] }));
+      groups.push(makeGroup(2,{ route:{ loading_place:'天津滨海', unloading_place:'沧州高新', route_name:'天津→沧州', cargo_name:'螺纹钢', weight_ton:'32' }, items:[{ plate_no:'鲁C99999', driver_name:'孙七', driver_phone:'13922223333', buildCount:1 }], failFirst:true }));
+    } else if(/成都-广州|川A00002/i.test(t)){
+      groups.push(makeGroup(1,{ route:{ loading_place:'成都', unloading_place:'广州', route_name:'成都→广州' }, items:[
+        { plate_no:'川A00002', driver_name:'王师傅', driver_phone:'13800001111', buildCount:4 },
+        { plate_no:'川A00003', driver_name:'赵四', driver_phone:'13700002222', buildCount:2 }
+      ]}));
+    } else if(/上海-杭州|沪A88888/i.test(t)){
+      groups.push(makeGroup(1,{ route:{ loading_place:'上海', unloading_place:'杭州', route_name:'上海→杭州' }, items:[{ plate_no:'沪A88888', driver_name:'张三', driver_phone:'13900000001', buildCount:0 }] }));
+    } else {
+      groups.push(makeGroup(1,{ route:{ loading_place:'（演示）', unloading_place:'（演示）', route_name:'演示线路' }, items:[{ plate_no:'京A12345', driver_name:'张三', driver_phone:'13800138000', buildCount:1 }] }));
+    }
+    return groups;
+  }
+
+  function makeGroup(idx, o){
+    var route = o.route || {};
+    enabledRouteFields().forEach(function(f){
+      if(route[f.id]==null && f.defaultValue) route[f.id] = f.defaultValue;
+    });
+    var items = (o.items||[{ buildCount:1 }]).map(function(it,i){
+      var row = { buildCount: it.buildCount!=null?it.buildCount:1, editing:false };
+      enabledCapFields().forEach(function(f){ row[f.id] = it[f.id]||''; });
+      return row;
+    });
+    return {
+      index: idx,
+      checked: true,
+      status: 'pending',
+      editing: false,
+      route: route,
+      items: items,
+      failFirst: !!o.failFirst,
+      buildAttempts: 0,
+      submittedM: 0,
+      failReason: '',
+      failKeys: []
+    };
+  }
+
+  function calcX(groups){
+    return groups.reduce(function(s,g){
+      return s + g.items.reduce(function(a,it){ return a + (effectiveBuildCount(it.buildCount)>0?effectiveBuildCount(it.buildCount):0); },0);
+    },0);
+  }
+
+  function calcN(round, area){
+    var sum = 0;
+    round.groups.forEach(function(g){
+      if(area==='main' && g.status!=='pending') return;
+      if(area==='detached' && g.status!=='detached') return;
+      if(!g.checked) return;
+      g.items.forEach(function(it){
+        var c = effectiveBuildCount(it.buildCount);
+        if(c>0 && c<=9) sum += c;
+      });
+    });
+    return sum;
+  }
+
+  function calcP(round, area){
+    var sel = round.groups.filter(function(g){
+      if(!g.checked) return false;
+      if(area==='main') return g.status==='pending';
+      if(area==='detached') return g.status==='detached';
+      return false;
+    });
+    var p = 0, k = sel.length;
+    sel.forEach(function(g){
+      g.items.forEach(function(it){
+        var c = effectiveBuildCount(it.buildCount);
+        if(c>0 && c<=9) p += c;
+      });
+    });
+    return { k:k, p:p };
+  }
+
+  function allSubmitted(round){
+    return round.groups.every(function(g){ return g.status==='submitted'; });
+  }
+
+  function renderInto(container){
+    container.innerHTML = '';
+    state.messages.forEach(function(msg){
+      var wrap = document.createElement('div');
+      var b = document.createElement('div');
+      b.className = 'bubble ' + (msg.role==='user'?'user':'bot');
+      if(msg.role==='user'){
+        b.textContent = msg.text;
+      } else if(msg.buildBatch){
+        fillBuildBubble(b, msg);
+      } else {
+        b.textContent = msg.text || '';
+      }
+      wrap.appendChild(b);
+      container.appendChild(wrap);
+    });
+
+    state.rounds.forEach(function(round){
+      var block = document.createElement('div');
+      block.className = 'round-block';
+      if(round.type==='recognize' && round.showSummary){
+        var sum = document.createElement('div');
+        sum.className = 'summary-line';
+        sum.textContent = '本次共解析出 ' + round.metaX + ' 条运单，分为 ' + round.groups.length + ' 个运单组';
+        block.appendChild(sum);
+      }
+      round.groups.forEach(function(g){
+        if(g.status==='submitted') block.appendChild(renderCompactCard(g, round));
+        else if(g.status!=='detached') block.appendChild(renderFullCard(g, round, 'main'));
+      });
+      var foot = renderFooter(round, 'main');
+      if(foot) block.appendChild(foot);
+      container.appendChild(block);
+    });
+
+    state.messages.forEach(function(msg){
+      if(!msg.buildBatch || msg.buildBatch.phase!=='done') return;
+      var round = state.rounds.find(function(r){ return r.id===msg.buildBatch.roundId; });
+      if(!round) return;
+      msg.buildBatch.outcomes.forEach(function(o){
+        if(o.type!=='fail') return;
+        var g = round.groups.find(function(x){ return x.index===o.groupIndex; });
+        if(!g || g.status!=='detached') return;
+        var dp = document.createElement('div');
+        dp.className = 'detached-panel';
+        dp.innerHTML = '<p class="detached-hint"><strong>失败重提</strong>：本组已迁入此处。同轮次其他待建单组已取消勾选。</p>';
+        dp.appendChild(renderFullCard(g, round, 'detached'));
+        var df = renderFooter(round, 'detached');
+        if(df) dp.appendChild(df);
+        container.appendChild(dp);
+      });
+    });
+  }
+
+  function render(){
+    renderInto(threadPc);
+    renderInto(threadM);
+    threadPc.scrollTop = threadPc.scrollHeight;
+    threadM.scrollTop = threadM.scrollHeight;
+  }
+
+  function renderCompactCard(g, round){
+    var card = document.createElement('div');
+    card.className = 'wb-card compact';
+    var head = document.createElement('div');
+    head.className = 'wb-head';
+    head.innerHTML = '<div class="left"><span style="font-weight:600">运单组 ' + g.index + '</span><span class="badge-ok">已建单</span></div>' +
+      '<div class="head-right"><span>已提交 ' + (g.submittedM||0) + ' 单</span><button type="button" class="link-copy">复制</button></div>';
+    head.querySelector('.link-copy').addEventListener('click', function(){ copyGroup(g, round); });
+    var meta = document.createElement('div');
+    meta.className = 'route-meta';
+    meta.textContent = '装｜' + (g.route.loading_place||'—') + '  卸｜' + (g.route.unloading_place||'—') + '  车线｜' + (g.route.route_name||'—');
+    card.appendChild(head);
+    card.appendChild(meta);
+    return card;
+  }
+
+  function renderFullCard(g, round, area){
+    var card = document.createElement('div');
+    card.className = 'wb-card';
+    card.dataset.round = round.id;
+    card.dataset.group = g.index;
+
+    var head = document.createElement('div');
+    head.className = 'wb-head';
+    var left = document.createElement('div');
+    left.className = 'left';
+    if(g.status==='detached'){
+      left.innerHTML = '<span style="font-weight:600">运单组 ' + g.index + '</span><span class="badge-fail">失败重提</span>';
+    } else {
+      var lab = document.createElement('label');
+      lab.className = 'chk';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!g.checked;
+      cb.addEventListener('change', function(){ g.checked = cb.checked; render(); });
+      lab.appendChild(cb);
+      lab.appendChild(document.createTextNode(' 运单组 ' + g.index));
+      left.appendChild(lab);
+    }
+    head.appendChild(left);
+    card.appendChild(head);
+
+    var meta = document.createElement('div');
+    meta.className = 'route-meta';
+    meta.textContent = '装：' + (g.route.loading_place||'—') + ' ｜ 卸：' + (g.route.unloading_place||'—') + ' ｜ 车线：' + (g.route.route_name||'—');
+    card.appendChild(meta);
+
+    var sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = '<div class="section-title">线路级字段</div>';
+    var fl = document.createElement('div');
+    fl.className = 'field-list';
+    enabledRouteFields().forEach(function(f){
+      var cell = document.createElement('div');
+      cell.className = 'fl-cell';
+      var val = g.route[f.id];
+      cell.innerHTML = '<div class="fl-lab">' + esc(f.label) + '</div>';
+      if(g.editing){
+        var inp = document.createElement('input');
+        inp.className = 'fl-inp';
+        inp.value = val||'';
+        inp.addEventListener('input', function(){ g.route[f.id]=inp.value; });
+        cell.appendChild(inp);
+      } else {
+        var span = document.createElement('div');
+        span.className = 'fl-val' + (val?'':' empty');
+        span.textContent = val || '—';
+        cell.appendChild(span);
+      }
+      fl.appendChild(cell);
+    });
+    sec.appendChild(fl);
+    card.appendChild(sec);
+
+    var capSec = document.createElement('div');
+    capSec.className = 'section';
+    capSec.innerHTML = '<div class="section-title">运力区</div>';
+    g.items.forEach(function(it, ii){
+      var cap = document.createElement('div');
+      cap.className = 'cap-block';
+      cap.innerHTML = '<div class="cap-title">运力' + (ii+1) + '</div>';
+      var grid = document.createElement('div');
+      grid.className = 'cap-grid';
+      enabledCapFields().forEach(function(f){
+        var row = document.createElement('div');
+        row.className = 'cap-row';
+        row.innerHTML = '<span class="lab">' + esc(f.label) + '</span>';
+        if(g.editing){
+          var inp = document.createElement('input');
+          inp.value = it[f.id]||'';
+          inp.addEventListener('input', function(){ it[f.id]=inp.value; });
+          row.appendChild(inp);
+        } else {
+          var v = document.createElement('span');
+          v.className = 'val';
+          v.textContent = it[f.id] || '—';
+          row.appendChild(v);
+        }
+        grid.appendChild(row);
+      });
+      cap.appendChild(grid);
+      var br = document.createElement('div');
+      br.className = 'build-row';
+      br.innerHTML = '<span>建单数量</span>';
+      var bcInp = document.createElement('input');
+      bcInp.type = 'number';
+      bcInp.min = '0';
+      bcInp.max = '9';
+      bcInp.value = it.buildCount===''||it.buildCount==null? '': String(it.buildCount);
+      bcInp.addEventListener('input', function(){
+        it.buildCount = bcInp.value;
+        render();
+      });
+      br.appendChild(bcInp);
+      br.appendChild(document.createTextNode(' （0 或空 = 无需建单）'));
+      cap.appendChild(br);
+      capSec.appendChild(cap);
+    });
+    card.appendChild(capSec);
+
+    if(g.failReason){
+      var w = document.createElement('div');
+      w.className = 'warn';
+      w.textContent = g.failReason;
+      card.appendChild(w);
+    }
+
+    if(g.status!=='submitted'){
+      var foot = document.createElement('div');
+      foot.className = 'card-foot';
+      var edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'link-edit';
+      edit.textContent = g.editing ? '完成' : '编辑 >';
+      edit.addEventListener('click', function(){
+        g.editing = !g.editing;
+        render();
+      });
+      foot.appendChild(edit);
+      card.appendChild(foot);
+    }
+    return card;
+  }
+
+  function renderFooter(round, area){
+    if(area==='main' && allSubmitted(round)) return null;
+    if(area==='detached'){
+      var has = round.groups.some(function(g){ return g.status==='detached'; });
+      if(!has) return null;
+    }
+    var n = calcN(round, area);
+    var foot = document.createElement('div');
+    foot.className = 'result-foot';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-build';
+    btn.textContent = '确定建单（' + n + '单）';
+    btn.disabled = n===0;
+    if(area==='main' && allSubmitted(round)) btn.classList.add('hidden');
+    btn.addEventListener('click', function(){ runBuild(round, area); });
+    foot.appendChild(btn);
+    return foot;
+  }
+
+  function fillBuildBubble(b, msg){
+    var bb = msg.buildBatch;
+    b.innerHTML = '';
+    var head = document.createElement('div');
+    head.textContent = '本次确定建单，共计' + bb.k + '个运单组，包含' + bb.p + '单运单。';
+    b.appendChild(head);
+    if(bb.phase==='running'){
+      b.appendChild(document.createTextNode('\n正在建单…'));
+      var pw = document.createElement('div');
+      pw.className = 'progress-wrap';
+      pw.innerHTML = '<div class="progress-text">执行进度 ' + bb.done + '/' + bb.total + '</div><div class="progress-bar"><div class="progress-fill" style="width:' + Math.round(bb.frac*100) + '%"></div></div>';
+      b.appendChild(pw);
+      return;
+    }
+    (bb.outcomes||[]).forEach(function(o){
+      var div = document.createElement('div');
+      div.className = 'outcome';
+      if(o.type==='success'){
+        var txt = '运单组' + o.groupIndex + '，创建成功：\n';
+        if(o.skippedZero) txt += '（含无需建单运力，无运单号）\n';
+        (o.nos||[]).forEach(function(n){ txt += n + '\n'; });
+        div.textContent = txt.trim();
+      } else {
+        div.appendChild(document.createTextNode('运单组' + o.groupIndex + '，创建失败：' + o.reason + '，'));
+        var a = document.createElement('span');
+        a.className = 'link-fail';
+        a.textContent = '点击修改';
+        a.addEventListener('click', function(){ openFailEdit(msg.buildBatch.roundId, o.groupIndex, msg.id); });
+        div.appendChild(a);
+      }
+      b.appendChild(div);
+    });
+  }
+
+  function runBuild(round, area){
+    for(var gi=0;gi<round.groups.length;gi++){
+      var g = round.groups[gi];
+      if(area==='main' && g.status!=='pending') continue;
+      if(area==='detached' && g.status!=='detached') continue;
+      if(!g.checked) continue;
+      for(var ii=0;ii<g.items.length;ii++){
+        var c = effectiveBuildCount(g.items[ii].buildCount);
+        if(c>9){ showToast('单运力行建单数量不能超过 9'); return; }
+      }
+    }
+    var stats = calcP(round, area);
+    if(stats.p===0 && stats.k===0){ showToast('请勾选运单组且建单数量大于 0'); return; }
+
+    var msgId = 'm' + Date.now();
+    var msg = { id: msgId, role:'bot', buildBatch:{ roundId: round.id, area: area, k: stats.k, p: stats.p, total: stats.p, done:0, frac:0, phase:'running', outcomes:null } };
+    state.messages.push(msg);
+    render();
+
+    var start = Date.now();
+    function tick(){
+      var elapsed = Date.now()-start;
+      var frac = Math.min(1, elapsed/2000);
+      msg.buildBatch.frac = frac;
+      msg.buildBatch.done = stats.p<=0?0: Math.min(stats.p, Math.ceil(frac*stats.p));
+      render();
+      if(elapsed<2000) requestAnimationFrame(tick);
+      else finishBuild(round, area, msg);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function finishBuild(round, area, msg){
+    msg.buildBatch.phase = 'done';
+    msg.buildBatch.done = msg.buildBatch.p;
+    var outcomes = [];
+    round.groups.forEach(function(g){
+      if(area==='main' && g.status!=='pending') return;
+      if(area==='detached' && g.status!=='detached') return;
+      if(!g.checked) return;
+
+      var physical = 0, skippedZero = false;
+      g.items.forEach(function(it){
+        var c = effectiveBuildCount(it.buildCount);
+        if(c===0) skippedZero = true;
+        else if(c>0 && c<=9) physical += c;
+      });
+
+      var shouldFail = false;
+      if(g.failFirst){
+        g.buildAttempts = (g.buildAttempts||0)+1;
+        if(g.buildAttempts<2){
+          shouldFail = true;
+          g.failReason = '接口返回「货物名称与地址校验未通过」';
+        }
+      }
+
+      if(shouldFail){
+        g.status = 'detached';
+        outcomes.push({ type:'fail', groupIndex:g.index, reason:'货物名称与地址校验未通过' });
+        round.groups.forEach(function(og){
+          if(og.index!==g.index && og.status==='pending') og.checked = false;
+        });
+      } else {
+        var nos = [];
+        for(var i=0;i<physical;i++){
+          state.wbSeq++;
+          nos.push('WB202604' + String(state.wbSeq).slice(-6));
+        }
+        g.submittedM = physical;
+        g.status = 'submitted';
+        g.checked = false;
+        g.editing = false;
+        g.failReason = '';
+        outcomes.push({ type:'success', groupIndex:g.index, nos:nos, skippedZero:skippedZero });
+      }
+    });
+    msg.buildBatch.outcomes = outcomes;
+    render();
+  }
+
+  function openFailEdit(roundId, groupIndex, failMsgId){
+    var round = state.rounds.find(function(r){ return r.id===roundId; });
+    var g = round && round.groups.find(function(x){ return x.index===groupIndex; });
+    if(!g) return;
+    if(g.status==='submitted'){ showToast('运单组已建单完成，不能再修改。'); return; }
+    g.status = 'detached';
+    g.checked = true;
+    g.editing = true;
+    round.groups.forEach(function(og){
+      if(og.index!==groupIndex && og.status==='pending') og.checked = false;
+    });
+    render();
+    showToast('本组已迁入失败区，请修改后确定建单');
+  }
+
+  function copyGroup(g, srcRound){
+    var clone = JSON.parse(JSON.stringify(g));
+    clone.status = 'pending';
+    clone.checked = true;
+    clone.editing = false;
+    clone.submittedM = 0;
+    clone.failFirst = false;
+    clone.buildAttempts = 0;
+    clone.failReason = '';
+    var newRound = {
+      id: 'r' + Date.now(),
+      type: 'copy',
+      showSummary: false,
+      metaX: 0,
+      groups: [clone]
+    };
+    state.rounds.push(newRound);
+    render();
+    showToast('已在底部新开复制轮次，可编辑后确定建单');
+  }
+
+  function send(){
+    syncInputs(true);
+    var text = inputText.value.trim();
+    if(!text){ showToast('请输入运单文本'); return; }
+    if(state.recognizing) return;
+    state.recognizing = true;
+    refreshSubmitState();
+    showToast('识别中…');
+
+    setTimeout(function(){
+      var groups = parseText(text);
+      var round = {
+        id: 'r' + Date.now(),
+        type: 'recognize',
+        showSummary: true,
+        metaX: calcX(groups),
+        groups: groups
+      };
+      state.messages.push({ role:'user', text:text });
+      var hits = findHitShortcuts(text);
+      var botIntro = '识别结果如下：';
+      if(hits.length){
+        botIntro = '已命中录单模板「' + hits[0].shortcut + '」（' + templateValuesLine(hits[0]) + '）\n' + botIntro;
+      }
+      state.messages.push({ role:'bot', text: botIntro });
+      state.rounds.push(round);
+      state.recognizing = false;
+      inputText.value = '';
+      mInputText.value = '';
+      refreshSubmitState();
+      render();
+    }, 800);
+  }
+
+  function clearAll(){
+    state.messages = [];
+    state.rounds = [];
+    inputText.value = '';
+    mInputText.value = '';
+    refreshSubmitState();
+    render();
+    showToast('已清空');
+  }
+
+  function loadCaseText(text){
+    inputText.value = text;
+    mInputText.value = text;
+    refreshSubmitState();
+  }
+
+  function resolveRoutePlaces(routeName){
+    var name = (routeName || '').trim();
+    if(!name) return null;
+    if(ROUTE_MAP[name]) return ROUTE_MAP[name];
+    var m = name.match(/^(.+?)[→—\-至]+(.+)$/);
+    if(m) return { loading: m[1].trim(), unloading: m[2].trim() };
+    return null;
+  }
+
+  function applyRoutePlaces(routeName){
+    var places = resolveRoutePlaces(routeName);
+    if(!places) return;
+    state.tplEditor.draft.fieldValues.loading_place = places.loading;
+    state.tplEditor.draft.fieldValues.unloading_place = places.unloading;
+    var lp = document.querySelector('#tplFieldForm [data-fid="loading_place"]');
+    var up = document.querySelector('#tplFieldForm [data-fid="unloading_place"]');
+    if(lp){
+      lp.value = places.loading;
+      syncFloatField(lp.closest('.float-field'));
+    }
+    if(up){
+      up.value = places.unloading;
+      syncFloatField(up.closest('.float-field'));
+    }
+  }
+
+  function syncFloatField(fieldEl){
+    if(!fieldEl) return;
+    var inp = fieldEl.querySelector('.ff-input');
+    fieldEl.classList.toggle('has-value', !!(inp && inp.value && inp.value.trim()));
+  }
+
+  function createFloatField(f, opts){
+    opts = opts || {};
+    var wrap = document.createElement('div');
+    wrap.className = 'tpl-field-inp-wrap';
+    var field = document.createElement('div');
+    field.className = 'float-field' + (opts.readonly ? ' readonly' : '');
+    var lab = document.createElement('div');
+    lab.className = 'ff-label';
+    lab.textContent = f.label + (opts.readonly ? '' : '');
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'ff-input';
+    inp.setAttribute('data-fid', f.id);
+    inp.value = state.tplEditor.draft.fieldValues[f.id] || '';
+    if(opts.readonly){
+      inp.readOnly = true;
+      inp.tabIndex = -1;
+    } else {
+      inp.placeholder = ' ';
+      inp.addEventListener('input', function(){
+        state.tplEditor.draft.fieldValues[f.id] = inp.value;
+        syncFloatField(field);
+        if(f.id === 'route_name') applyRoutePlaces(inp.value);
+        if(SEARCH_FIELD_IDS.indexOf(f.id) >= 0) showSearchDropdown(wrap, inp, f.id);
+      });
+      inp.addEventListener('focus', function(){
+        field.classList.add('focused');
+        if(SEARCH_FIELD_IDS.indexOf(f.id) >= 0) showSearchDropdown(wrap, inp, f.id);
+      });
+      inp.addEventListener('blur', function(){
+        field.classList.remove('focused');
+        syncFloatField(field);
+      });
+    }
+    field.appendChild(lab);
+    field.appendChild(inp);
+    if(!opts.readonly && SEARCH_FIELD_IDS.indexOf(f.id) >= 0){
+      var chev = document.createElement('span');
+      chev.className = 'ff-chev';
+      chev.textContent = '▼';
+      field.appendChild(chev);
+    }
+    wrap.appendChild(field);
+    syncFloatField(field);
+    return wrap;
+  }
+
+  function fieldCfgDisplayOrder(){
+    var route = state.fieldDefs.filter(function(f){ return f.zone==='route'; })
+      .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+    var cap = CAP_ORDER.map(function(id){ return state.fieldDefs.find(function(f){ return f.id===id; }); }).filter(Boolean);
+    return route.concat(cap);
+  }
+
+  function renderFieldCfg(){
+    var grid = document.getElementById('fieldCfgGrid');
+    grid.innerHTML = '';
+    fieldCfgDisplayOrder().forEach(function(f){
+      var idx = state.fieldDefs.indexOf(f);
+      var tile = document.createElement('label');
+      tile.className = 'field-tile';
+      tile.innerHTML = '<input type="checkbox" data-i="'+idx+'" '+(f.enabled?'checked':'')+'><span>'+esc(f.label)+'</span>';
+      grid.appendChild(tile);
+    });
+  }
+
+  function switchCfgTab(panelId){
+    document.querySelectorAll('#modalRecordCfg .cfg-tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-panel')===panelId);
+    });
+    document.querySelectorAll('#modalRecordCfg .cfg-panel').forEach(function(p){
+      p.classList.toggle('active', p.id===panelId);
+    });
+  }
+
+  function openRecordCfg(tab, mode){
+    var modal = document.getElementById('modalRecordCfg');
+    modal.classList.remove('cfg-mobile','cfg-pc');
+    modal.classList.add(mode === 'mobile' ? 'cfg-mobile' : 'cfg-pc');
+    renderFieldCfg();
+    showTplListView();
+    renderTplList();
+    switchCfgTab(tab || 'panelField');
+    modal.classList.add('show');
+  }
+
+  function closeRecordCfg(){
+    document.getElementById('modalRecordCfg').classList.remove('show','cfg-mobile','cfg-pc');
+    showTplListView();
+  }
+
+  function showTplListView(){
+    document.getElementById('tplListView').style.display = '';
+    document.getElementById('tplEditorView').style.display = 'none';
+    state.tplEditor = { mode: null, editId: null, draft: { shortcut: '', fieldValues: {} } };
+  }
+
+  function showTplEditorView(mode, tpl){
+    document.getElementById('tplListView').style.display = 'none';
+    document.getElementById('tplEditorView').style.display = '';
+    document.getElementById('tplEditorTitle').textContent = mode === 'edit' ? '修改录单模板' : '新增录单模板';
+    var draft = {
+      shortcut: tpl ? tpl.shortcut : '',
+      fieldValues: tpl ? JSON.parse(JSON.stringify(filterFieldValuesToEnabled(tpl.fieldValues || {}))) : {}
+    };
+    if(draft.fieldValues.route_name){
+      var places = resolveRoutePlaces(draft.fieldValues.route_name);
+      if(places){
+        draft.fieldValues.loading_place = places.loading;
+        draft.fieldValues.unloading_place = places.unloading;
+      }
+    }
+    state.tplEditor = { mode: mode, editId: tpl ? tpl.id : null, draft: draft };
+    document.getElementById('tplShortcutInp').value = draft.shortcut;
+    renderTplFieldForm();
+  }
+
+  function renderTplList(){
+    var tb = document.getElementById('tplListBody');
+    tb.innerHTML = '';
+    if(!state.templates.length){
+      var tr0 = document.createElement('tr');
+      tr0.innerHTML = '<td colspan="3" style="color:var(--hint);text-align:center">暂无模板，点击「+ 新增」</td>';
+      tb.appendChild(tr0);
+      return;
+    }
+    state.templates.forEach(function(tpl){
+      var tr = document.createElement('tr');
+      var summary = tplSummary(tpl);
+      tr.innerHTML = '<td><strong>' + esc(tpl.shortcut) + '</strong></td><td><span class="tpl-summary" title="' + esc(summary) + '">' + esc(summary) + '</span></td>' +
+        '<td><button type="button" class="tb tpl-edit" data-id="' + esc(tpl.id) + '">修改</button> ' +
+        '<button type="button" class="tb tpl-del" data-id="' + esc(tpl.id) + '">删除</button></td>';
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('.tpl-edit').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var tpl = state.templates.find(function(t){ return t.id === btn.getAttribute('data-id'); });
+        if(tpl) showTplEditorView('edit', tpl);
+      });
+    });
+    tb.querySelectorAll('.tpl-del').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.pendingTplDeleteId = btn.getAttribute('data-id');
+        document.getElementById('modalTplDelete').classList.add('show');
+      });
+    });
+  }
+
+  function renderTplFieldForm(){
+    var form = document.getElementById('tplFieldForm');
+    form.innerHTML = '';
+    var fields = enabledFieldsSorted();
+    if(!fields.length){
+      form.innerHTML = '<div style="padding:12px;color:var(--hint);font-size:13px">请先在「运单字段配置」中勾选字段</div>';
+      return;
+    }
+    var routeZone = document.createElement('div');
+    routeZone.className = 'tpl-route-zone';
+    var routeField = fields.find(function(f){ return f.id === 'route_name'; });
+    if(routeField) routeZone.appendChild(createFloatField(routeField));
+    var placeRow = document.createElement('div');
+    placeRow.className = 'tpl-route-row';
+    ['loading_place','unloading_place'].forEach(function(fid){
+      var pf = fields.find(function(f){ return f.id === fid; });
+      if(pf) placeRow.appendChild(createFloatField(pf, { readonly: true }));
+    });
+    if(placeRow.children.length) routeZone.appendChild(placeRow);
+    if(routeZone.children.length) form.appendChild(routeZone);
+
+    var gridFields = fields.filter(function(f){
+      return f.id !== 'route_name' && f.id !== 'loading_place' && f.id !== 'unloading_place';
+    });
+    if(gridFields.length){
+      var grid = document.createElement('div');
+      grid.className = 'tpl-field-grid';
+      gridFields.forEach(function(f){
+        grid.appendChild(createFloatField(f));
+      });
+      form.appendChild(grid);
+    }
+  }
+
+  function closeAllSearchDropdowns(){
+    document.querySelectorAll('.tpl-search-list').forEach(function(el){ el.classList.remove('show'); });
+  }
+
+  function showSearchDropdown(wrap, inp, fieldId){
+    closeAllSearchDropdowns();
+    var list = wrap.querySelector('.tpl-search-list');
+    if(!list){
+      list = document.createElement('div');
+      list.className = 'tpl-search-list';
+      wrap.appendChild(list);
+    }
+    var q = (inp.value || '').trim().toLowerCase();
+    var opts = (MOCK_SEARCH[fieldId] || []).filter(function(o){
+      return !q || o.toLowerCase().indexOf(q) >= 0;
+    });
+    list.innerHTML = '';
+    if(!opts.length){
+      list.innerHTML = '<div class="tpl-search-item" style="color:var(--hint);cursor:default">无匹配项</div>';
+    } else {
+      opts.forEach(function(opt){
+        var item = document.createElement('div');
+        item.className = 'tpl-search-item';
+        item.textContent = opt;
+        item.addEventListener('mousedown', function(e){
+          e.preventDefault();
+          inp.value = opt;
+          state.tplEditor.draft.fieldValues[fieldId] = opt;
+          syncFloatField(inp.closest('.float-field'));
+          if(fieldId === 'route_name') applyRoutePlaces(opt);
+          list.classList.remove('show');
+        });
+        list.appendChild(item);
+      });
+    }
+    list.classList.add('show');
+  }
+
+  function saveTplEditor(){
+    var sc = (document.getElementById('tplShortcutInp').value || '').trim();
+    if(!sc){ showToast('请填写简称'); return; }
+    var fv = filterFieldValuesToEnabled(state.tplEditor.draft.fieldValues);
+    if(state.tplEditor.mode === 'edit'){
+      var tpl = state.templates.find(function(t){ return t.id === state.tplEditor.editId; });
+      if(tpl){
+        tpl.shortcut = sc;
+        tpl.fieldValues = fv;
+      }
+    } else {
+      state.templates.push({ id: 't' + Date.now(), shortcut: sc, fieldValues: fv });
+    }
+    showTplListView();
+    renderTplList();
+    showToast('录单模板已保存');
+  }
+
+  function confirmDeleteTpl(){
+    if(!state.pendingTplDeleteId) return;
+    state.templates = state.templates.filter(function(t){ return t.id !== state.pendingTplDeleteId; });
+    state.pendingTplDeleteId = null;
+    document.getElementById('modalTplDelete').classList.remove('show');
+    renderTplList();
+    showToast('已删除录单模板');
+  }
+
+  document.getElementById('btnSend').addEventListener('click', send);
+  document.getElementById('btnSubmitM').addEventListener('click', send);
+  document.getElementById('btnClear').addEventListener('click', clearAll);
+  document.getElementById('mClear').addEventListener('click', clearAll);
+  inputText.addEventListener('input', function(){ syncInputs(true); });
+  mInputText.addEventListener('input', function(){ syncInputs(false); });
+  document.querySelectorAll('.case-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      loadCaseText(CASE_TEXT[btn.getAttribute('data-case')] || '');
+      showToast('已载入 ' + btn.textContent);
+    });
+  });
+
+  document.getElementById('btnRecordCfg').addEventListener('click', function(){ openRecordCfg('panelField', 'pc'); });
+  document.getElementById('btnRecordCfgM').addEventListener('click', function(){ openRecordCfg('panelField', 'mobile'); });
+  document.getElementById('recordCfgClose').addEventListener('click', closeRecordCfg);
+  document.getElementById('recordCfgCancel').addEventListener('click', closeRecordCfg);
+  document.querySelectorAll('#modalRecordCfg .cfg-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){ switchCfgTab(tab.getAttribute('data-panel')); });
+  });
+  document.getElementById('recordCfgOk').addEventListener('click', function(){
+    document.querySelectorAll('#fieldCfgGrid input[type=checkbox]').forEach(function(cb){
+      var i = parseInt(cb.getAttribute('data-i'),10);
+      state.fieldDefs[i].enabled = cb.checked;
+    });
+    state.templates.forEach(function(tpl){
+      tpl.fieldValues = filterFieldValuesToEnabled(tpl.fieldValues);
+    });
+    closeRecordCfg();
+    showToast('运单字段配置已保存（当前用户 · 下一轮识别生效）');
+  });
+  document.getElementById('modalRecordCfg').addEventListener('click', function(e){
+    if(e.target.id==='modalRecordCfg') closeRecordCfg();
+  });
+
+  document.getElementById('tplAddNew').addEventListener('click', function(){
+    switchCfgTab('panelTpl');
+    showTplEditorView('add', null);
+  });
+  document.getElementById('tplEditorCancel').addEventListener('click', function(){
+    showTplListView();
+    renderTplList();
+  });
+  document.getElementById('tplEditorSave').addEventListener('click', saveTplEditor);
+  document.getElementById('tplDelCancel').addEventListener('click', function(){
+    state.pendingTplDeleteId = null;
+    document.getElementById('modalTplDelete').classList.remove('show');
+  });
+  document.getElementById('tplDelOk').addEventListener('click', confirmDeleteTpl);
+  document.getElementById('modalTplDelete').addEventListener('click', function(e){
+    if(e.target.id === 'modalTplDelete'){
+      state.pendingTplDeleteId = null;
+      document.getElementById('modalTplDelete').classList.remove('show');
+    }
+  });
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.tpl-field-inp-wrap')) closeAllSearchDropdowns();
+  });
+
+  render();
+  refreshSubmitState();
+})();
+</script>
+</body>
+</html>
